@@ -199,9 +199,10 @@ async function startServer() {
     }
 }
 
-if (!process.env.VERCEL) {
+if (require.main === module) {
     startServer();
 }
+
 
 
 process.on("unhandledRejection", (err) => {
