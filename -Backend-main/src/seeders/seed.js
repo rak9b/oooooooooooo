@@ -1,5 +1,5 @@
 require('dotenv').config();
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const sequelize = require('../config/sequelize.db');
 const { User, Wallet, Role, Permission, RolePermission, SystemSettings } = require('../models');
 

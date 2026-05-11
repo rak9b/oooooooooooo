@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const verifyToken = require("../middleware/auth.middleware");
 const allowRoles = require("../middleware/role.middleware");
-const bcrypt = require("bcrypt")
+const bcrypt = require("bcryptjs")
 
 const User = require("../modules/user/user.model");
 const Wallet = require("../modules/wallet/wallet.model");

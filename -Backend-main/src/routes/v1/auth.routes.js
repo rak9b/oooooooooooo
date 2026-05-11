@@ -1,5 +1,5 @@
 const router = require("express").Router();
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 const { User, Wallet, Role } = require("../../models");
 const { authenticate, generateToken, createSession, getActiveSessions, destroySession } = require("../../middleware/auth.middleware");
 const { asyncHandler } = require("../../middleware/errorHandler");

@@ -41,6 +41,8 @@
 
 
 const { Sequelize } = require("sequelize");
+require('mysql2');
+
 
 const sequelize = new Sequelize(
     process.env.DB_NAME,
