@@ -1,0 +1,66 @@
+:root {
+    --primary-color: #20c997; /* ডাইনামিক থিম থেকে আসবে */
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Noto Sans Bengali', sans-serif;
+    background: #f8f9fa;
+    color: #333;
+}
+
+header {
+    background: var(--primary-color);
+    color: white;
+    padding: 1rem;
+    text-align: center;
+}
+
+#sidebar {
+    width: 250px;
+    background: #343a40;
+    color: white;
+    position: fixed;
+    height: 100%;
+    top: 0;
+    left: 0;
+    padding-top: 60px; /* হেডারের জন্য স্পেস */
+}
+
+#sidebar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+#sidebar li a {
+    display: block;
+    padding: 10px 20px;
+    color: white;
+    text-decoration: none;
+}
+
+#sidebar li a:hover {
+    background: #495057;
+}
+
+main {
+    margin-left: 250px;
+    padding: 2rem;
+}
+
+.hidden {
+    display: none !important;
+}
+
+#logo-container img {
+    max-height: 50px;
+}
+
+#deposit-info {
+    margin-top: 20px;
+    padding: 10px;
+    background: #e9ecef;
+    border-radius: 5px;
+}

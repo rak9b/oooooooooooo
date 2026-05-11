@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="site-title">B2B Sub-Admin ড্যাশবোর্ড</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+    <header>
+        <div class="logo" id="logo-container"></div>
+        <h1>B2B Sub-Admin ড্যাশবোর্ড</h1>
+    </header>
+    <nav id="sidebar">
+        <ul class="general-section">
+            <li><a href="#"><i class="fas fa-home"></i> হোম</a></li>
+            <li><a href="#"><i class="fas fa-wallet"></i> ওয়ালেট</a></li>
+        </ul>
+        <ul class="agent-section">
+            <li><a href="#"><i class="fas fa-users"></i> এজেন্ট ম্যানেজ</a></li>
+            <li><a href="#" id="deposit-link"><i class="fas fa-money-bill-wave"></i> ডিপোজিট</a></li>
+        </ul>
+    </nav>
+    <main>
+        <section id="content">
+            <h2>B2B অপশন</h2>
+            <div id="dynamic-content">লোড হচ্ছে...</div>
+        </section>
+    </main>
+    <script src="../../JS/app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const token = localStorage.getItem('token');
+            if (!token) return window.location.href = '/login.html';
+
+            const theme = JSON.parse(localStorage.getItem('siteTheme')) || {};
+            applyTheme(theme);
+
+            const user = await fetchUserInfo(token);
+            document.querySelector('.agent-section').classList.toggle('hidden', !user.role.includes('B2B_SUB_ADMIN'));
+        });
+    </script>
+</body>
+</html>

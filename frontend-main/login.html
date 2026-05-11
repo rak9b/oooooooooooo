@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agent/Owner Login | BetX365</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f7b112;
+            /* থিমের হলুদ রঙ */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .login-container {
+            width: 350px;
+            background: #fff;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+
+        .header-bg {
+            background: url('https://your-image-url.com/soccer-bg.jpg') center/cover;
+            height: 200px;
+            position: relative;
+        }
+
+        .logo-box {
+            position: absolute;
+            bottom: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #fff;
+            padding: 10px;
+            border-radius: 5px;
+            font-weight: bold;
+            font-size: 24px;
+            color: #333;
+        }
+
+        .form-box {
+            padding: 50px 20px 20px;
+        }
+
+        input {
+            width: 90%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background: #fff9e6;
+        }
+
+        .validation-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 95%;
+            margin: 0 auto;
+        }
+
+        .code-box {
+            background: #eee;
+            padding: 10px;
+            font-weight: bold;
+            border-radius: 5px;
+        }
+
+        .login-btn {
+            width: 95%;
+            padding: 12px;
+            background: #333;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+
+        .login-btn:hover {
+            background: #000;
+        }
+
+        .footer-social {
+            background: #7a5e00;
+            padding: 15px;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .footer-social img {
+            width: 30px;
+            filter: invert(1);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="login-container">
+        <div class="header-bg">
+            <div class="logo-box">bet<span style="color:#f7b112">X</span>365</div>
+        </div>
+
+        <div class="form-box">
+            <form id="loginForm">
+                <input type="text" placeholder="Username" required>
+                <input type="password" placeholder="Password" required>
+
+                <div class="validation-row">
+                    <input type="text" id="validation-input" placeholder="Validation Code" style="width: 60%;" autocomplete="off">
+                    <div class="code-box" id="captcha-code" title="Click to refresh code" style="cursor:pointer;user-select:none;letter-spacing:3px;font-family:'Courier New',monospace;">0000</div>
+                </div>
+
+                <button type="submit" class="login-btn">Login</button>
+            </form>
+
+            <button class="login-btn" style="background:#000; margin-top: 10px; font-size: 14px;">
+                <img src="https://cdn-icons-png.flaticon.com/512/888/888841.png" width="15"> | DOWNLOAD APP
+            </button>
+        </div>
+
+        <div class="footer-social">
+            <img src="https://cdn-icons-png.flaticon.com/512/2111/2111646.png" alt="Telegram">
+            <img src="https://cdn-icons-png.flaticon.com/512/174/174872.png" alt="Skype">
+            <img src="https://cdn-icons-png.flaticon.com/512/174/174855.png" alt="Instagram">
+        </div>
+    </div>
+
+    <script type="module" src="./JS/login.js"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,1167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BetX365 - Agent Panel</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', Arial, sans-serif; background: #f5f5f5; color: #333; font-size: 13px; }
+
+    /* ============= TOP HEADER ============= */
+    .header { background: #000; padding: 12px 25px; display: flex; justify-content: space-between; align-items: center; }
+    .header .brand { display: flex; align-items: center; gap: 10px; }
+    .header .brand img { height: 32px; }
+    .header .brand-text { color: #f7b112; font-size: 22px; font-weight: 700; letter-spacing: 0.5px; }
+    .header .brand-text span { color: white; font-size: 11px; font-weight: 400; margin-left: 4px; }
+    .header-right { display: flex; align-items: center; gap: 20px; color: white; }
+    .header-right .icon-badge { position: relative; cursor: pointer; }
+    .header-right .icon-badge i { font-size: 22px; }
+    .header-right .icon-badge .badge-num { position: absolute; top: -5px; right: -8px; background: #28a745; color: white; border-radius: 10px; padding: 1px 6px; font-size: 10px; font-weight: bold; }
+    .header-right .icon-badge.red .badge-num { background: #dc3545; }
+    .header-right .user-info { font-size: 12px; }
+    .header-right .user-info b { color: #f7b112; }
+    .header-right .balance { font-size: 13px; }
+    .header-right .balance b { color: #28a745; font-size: 14px; }
+    .header-right .refresh-btn { background: none; border: 1px solid #444; color: white; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 12px; }
+
+    /* ============= NAV ============= */
+    .navbar { background: #f7b112; display: flex; align-items: center; overflow: visible; padding: 0; position: relative; z-index: 100; }
+    .nav-item { padding: 12px 18px; color: #1f2937; font-weight: 600; cursor: pointer; white-space: nowrap; transition: all 0.2s; font-size: 13px; position: relative; }
+    .nav-item:hover { background: rgba(0,0,0,0.08); }
+    .nav-item.active { background: #1f2937; color: #f7b112; }
+    .nav-item.dropdown::after { content: '▼'; font-size: 8px; margin-left: 6px; opacity: 0.6; }
+    .nav-dropdown { position: absolute; top: 100%; left: 0; background: #1f2937; border-radius: 0 0 6px 6px; box-shadow: 0 6px 16px rgba(0,0,0,0.25); min-width: 220px; display: none; z-index: 1000; }
+    .nav-item.dropdown:hover .nav-dropdown { display: block; }
+    .nav-dropdown a { display: block; padding: 11px 16px; color: white; text-decoration: none; font-size: 13px; font-weight: 500; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.05); transition: background 0.15s; }
+    .nav-dropdown a:hover { background: #374151; color: #f7b112; }
+    .nav-dropdown a:last-child { border-bottom: none; }
+    .nav-right { margin-left: auto; display: flex; align-items: center; gap: 15px; padding-right: 20px; font-size: 12px; color: #1f2937; }
+    .nav-right .logout-btn { background: #dc3545; color: white; padding: 6px 14px; border-radius: 4px; border: none; cursor: pointer; font-weight: 600; }
+
+    /* ============= NEWS BAR ============= */
+    .news-bar { background: #1f2937; color: white; padding: 8px 25px; display: flex; align-items: center; gap: 15px; font-size: 12px; }
+    .news-bar .news-icon { color: #f7b112; }
+    .news-bar .news-date { background: rgba(247,177,18,0.15); color: #f7b112; padding: 3px 10px; border-radius: 3px; font-weight: 600; font-size: 11px; }
+    .news-bar .news-text { color: #d1d5db; flex: 1; overflow: hidden; }
+    .news-bar marquee { color: #d1d5db; }
+
+    /* ============= MAIN ============= */
+    .main { padding: 15px 25px; max-width: 1400px; margin: 0 auto; }
+
+    .referral-bar { background: white; border-radius: 6px; padding: 12px 15px; display: flex; align-items: center; gap: 12px; margin-bottom: 15px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+    .referral-bar label { font-weight: 600; color: #555; font-size: 13px; }
+    .referral-bar .ref-link { background: #28a745; color: white; padding: 8px 14px; border-radius: 4px; flex: 1; font-size: 13px; word-break: break-all; }
+    .referral-bar .copy-btn { background: #f7b112; color: #1f2937; border: none; padding: 8px 18px; border-radius: 4px; font-weight: 600; cursor: pointer; }
+
+    .filters-bar { background: white; border-radius: 6px; padding: 12px 15px; display: flex; align-items: center; gap: 10px; margin-bottom: 15px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+    .filters-bar .search-box { flex: 1; max-width: 300px; position: relative; }
+    .filters-bar .search-box input { width: 100%; padding: 8px 14px 8px 38px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; }
+    .filters-bar .search-box i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #999; }
+    .filters-bar .search-btn { background: #1f2937; color: white; padding: 8px 18px; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; }
+    .filters-bar .status-label { color: #555; font-weight: 600; }
+    .filters-bar select { padding: 8px 14px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; cursor: pointer; }
+    .filters-bar .add-btn { margin-left: auto; background: white; color: #1f2937; border: 1px solid #ddd; padding: 8px 18px; border-radius: 4px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; }
+    .filters-bar .add-btn:hover { background: #f7b112; border-color: #f7b112; }
+
+    /* ============= STATS GRID ============= */
+    .stats-row { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; margin-bottom: 15px; }
+    .stat-card { background: white; padding: 12px 15px; border-radius: 6px; border-bottom: 3px solid #f7b112; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+    .stat-card h4 { font-size: 11px; color: #666; font-weight: 600; margin-bottom: 6px; }
+    .stat-card .val { font-size: 16px; font-weight: 700; color: #1f2937; }
+    .stat-card .val.red { color: #dc3545; }
+    .stat-card .val span { color: #dc3545; }
+    @media(max-width:1200px){ .stats-row { grid-template-columns: repeat(4, 1fr); } }
+    @media(max-width:768px){ .stats-row { grid-template-columns: repeat(2, 1fr); } }
+
+    /* ============= TABLE ============= */
+    .data-card { background: white; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); overflow: hidden; margin-bottom: 15px; }
+    .data-table { width: 100%; border-collapse: collapse; }
+    .data-table thead { background: #f3f4f6; }
+    .data-table th { padding: 12px 15px; text-align: left; font-size: 12px; font-weight: 700; color: #4b5563; text-transform: capitalize; border-bottom: 2px solid #e5e7eb; }
+    .data-table td { padding: 12px 15px; border-bottom: 1px solid #f3f4f6; font-size: 13px; vertical-align: middle; }
+    .data-table tbody tr:hover { background: #fafbfc; }
+    .data-table .role-tag { display: inline-block; padding: 2px 8px; border-radius: 3px; font-size: 10px; font-weight: 700; color: white; margin-right: 6px; }
+    .role-PL { background: #f97316; }
+    .role-MA { background: #8b5cf6; }
+    .role-SA { background: #06b6d4; }
+    .data-table .username { color: #1f2937; font-weight: 600; text-decoration: underline; cursor: pointer; }
+    .data-table .username:hover { color: #f7b112; }
+    .data-table .credit-ref { color: #1f2937; cursor: pointer; }
+    .data-table .credit-ref:hover { color: #f7b112; }
+    .data-table .neg { color: #dc3545; }
+    .status-pill { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 4px; font-size: 11px; font-weight: 600; }
+    .status-active { background: #dcfce7; color: #166534; }
+    .status-active::before { content: '●'; color: #22c55e; font-size: 8px; }
+    .status-inactive { background: #fee2e2; color: #991b1b; }
+
+    .action-icons { display: flex; gap: 8px; }
+    .action-icons .ic { width: 28px; height: 28px; border-radius: 4px; background: #f3f4f6; color: #4b5563; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; border: none; font-size: 13px; }
+    .action-icons .ic:hover { background: #f7b112; color: white; }
+
+    /* ============= PAGINATION ============= */
+    .pagination { display: flex; justify-content: center; align-items: center; gap: 5px; padding: 15px; }
+    .pagination button { padding: 6px 14px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 12px; }
+    .pagination button.active { background: #1f2937; color: white; border-color: #1f2937; }
+    .pagination button:disabled { opacity: 0.5; cursor: not-allowed; }
+    .pagination input { width: 50px; padding: 6px 8px; border: 1px solid #ddd; border-radius: 4px; text-align: center; }
+
+    /* ============= FOOTER ICONS ============= */
+    .footer-actions { background: white; border-radius: 6px; padding: 12px 20px; display: flex; justify-content: flex-end; gap: 30px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+    .footer-actions .fa-item { display: flex; align-items: center; gap: 6px; color: #4b5563; font-size: 12px; cursor: pointer; transition: color 0.2s; }
+    .footer-actions .fa-item:hover { color: #f7b112; }
+    .footer-actions .fa-item i { font-size: 14px; }
+
+    /* ============= MODAL ============= */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: flex; justify-content: center; align-items: center; z-index: 9999; }
+    .modal-box { background: white; padding: 25px; border-radius: 8px; width: 420px; max-width: 90%; }
+    .modal-box h3 { color: #1f2937; margin-bottom: 18px; font-size: 16px; border-bottom: 2px solid #f7b112; padding-bottom: 10px; }
+    .form-group { margin-bottom: 14px; }
+    .form-group label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 5px; color: #555; }
+    .input { width: 100%; padding: 9px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; }
+    .input:focus { outline: none; border-color: #f7b112; }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+    .btn { padding: 8px 18px; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 13px; }
+    .btn-primary { background: #f7b112; color: #1f2937; }
+    .btn-cancel { background: #6b7280; color: white; }
+    .btn-success { background: #28a745; color: white; }
+    .btn-danger { background: #dc3545; color: white; }
+
+    .toast { position: fixed; top: 20px; right: 20px; padding: 12px 20px; border-radius: 6px; color: white; font-size: 13px; z-index: 99999; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+    .toast-success { background: #28a745; }
+    .toast-error { background: #dc3545; }
+    .empty { text-align: center; padding: 40px; color: #9ca3af; }
+    #view-area { display: none; }
+
+    .info-banner { background: #fef3c7; border-left: 4px solid #f7b112; padding: 10px 15px; border-radius: 4px; margin-bottom: 15px; font-size: 12px; color: #92400e; }
+
+    /* Risk Management Sections */
+    .risk-summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
+    @media (max-width: 768px) { .risk-summary-grid { grid-template-columns: 1fr; } }
+    .risk-section { background: white; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); margin-bottom: 12px; overflow: hidden; }
+    .risk-section-header { background: #4b5563; color: white; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; font-weight: 600; font-size: 13px; }
+    .risk-section-header .actions { display: flex; gap: 6px; }
+    .risk-section-header .actions button { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 4px 10px; border-radius: 3px; cursor: pointer; font-size: 11px; }
+    .risk-section-header .actions button:hover { background: rgba(255,255,255,0.25); }
+    .risk-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .risk-table thead { background: #f9fafb; }
+    .risk-table th { padding: 8px 12px; text-align: left; color: #4b5563; font-weight: 600; border-bottom: 1px solid #e5e7eb; }
+    .risk-table th.pl-header { background: #fbe1a8; color: #92400e; text-align: center; }
+    .risk-table th.dl-header { background: #fef3c7; color: #92400e; text-align: center; padding: 8px; }
+    .risk-table td { padding: 8px 12px; border-bottom: 1px solid #f3f4f6; }
+    .risk-table .no-data { text-align: left; color: #4b5563; padding: 12px; font-size: 12px; background: #f9fafb; }
+    .tabs-bar { display: flex; gap: 0; background: #4b5563; border-radius: 6px 6px 0 0; overflow: hidden; }
+    .tabs-bar .tab-btn { flex: 1; padding: 10px 14px; background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.7); border: none; cursor: pointer; font-size: 12px; font-weight: 600; border-right: 1px solid rgba(255,255,255,0.1); }
+    .tabs-bar .tab-btn.active { background: #1f2937; color: #f7b112; }
+    .tabs-bar .tab-btn:hover:not(.active) { background: rgba(255,255,255,0.1); color: white; }
+  </style>
+  <script src="../js/api.js"></script>
+</head>
+<body>
+
+  <!-- TOP HEADER -->
+  <div class="header">
+    <div class="brand">
+      <span class="brand-text">bet<span style="color:#f7b112">X</span>365 <span>Agent</span></span>
+    </div>
+    <div class="header-right">
+      <div class="icon-badge"><i class="fas fa-arrow-down" style="color:#28a745;"></i><span class="badge-num" id="dep-count">0</span></div>
+      <div class="icon-badge red"><i class="fas fa-arrow-up" style="color:#dc3545;"></i><span class="badge-num" id="wd-count">0</span></div>
+      <div class="user-info"><b id="role-short">MA</b> <span id="username-display">-</span></div>
+      <div class="balance">Main <b id="balance-display">BDT 0.00</b></div>
+      <button class="refresh-btn" onclick="refreshAll()"><i class="fas fa-sync"></i></button>
+    </div>
+  </div>
+
+  <!-- NAV -->
+  <div class="navbar">
+    <div class="nav-item active" data-tab="downline">Downline List</div>
+    <div class="nav-item" data-tab="account">My Account</div>
+    <div class="nav-item" data-tab="report">My Report</div>
+    <div class="nav-item" data-tab="betlist">BetList</div>
+    <div class="nav-item" data-tab="betlive">BetListLive</div>
+    <div class="nav-item" data-tab="risk">Risk Management</div>
+    <div class="nav-item" data-tab="banking">Banking</div>
+    <div class="nav-item" data-tab="banks">Banks</div>
+    <div class="nav-item" data-tab="dep-req">Deposit Req</div>
+    <div class="nav-item dropdown">
+      Wallet Management
+      <div class="nav-dropdown">
+        <a data-tab="wallet-deposit">Wallet Deposit</a>
+        <a data-tab="wallet-withdraw">Wallet Withdraw</a>
+        <a data-tab="wallet-deposit-history">Wallet Deposit History</a>
+        <a data-tab="wallet-withdraw-history">Wallet Withdraw History</a>
+      </div>
+    </div>
+    <div class="nav-item" data-tab="settings">Admin Setting</div>
+    <div class="nav-right">
+      <span><i class="fas fa-clock"></i> Time Zone : GMT+6:00</span>
+      <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+    </div>
+  </div>
+
+  <!-- NEWS -->
+  <div class="news-bar">
+    <i class="fas fa-microphone news-icon"></i>
+    <span class="news-date" id="news-date">Today</span>
+    <div class="news-text"><marquee scrollamount="5"><span id="news-content">Welcome to BetX365 — Stay tuned for updates...</span></marquee></div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div id="home-view">
+      <!-- Referral Code -->
+      <div class="referral-bar">
+        <label>Referral Code:</label>
+        <div class="ref-link" id="ref-link">Loading...</div>
+        <button class="copy-btn" onclick="copyRef()"><i class="fas fa-copy"></i> Copy</button>
+      </div>
+
+      <!-- Filters -->
+      <div class="filters-bar">
+        <div class="search-box"><i class="fas fa-search"></i><input id="search-input" placeholder="Search username..." onkeyup="searchUsers(this.value)"></div>
+        <button class="search-btn" onclick="searchUsers(document.getElementById('search-input').value)">Search</button>
+        <span class="status-label">Status</span>
+        <select id="status-filter" onchange="loadDownline()">
+          <option value="">ALL</option>
+          <option value="active" selected>ACTIVE</option>
+          <option value="inactive">INACTIVE</option>
+          <option value="blocked">BLOCKED</option>
+        </select>
+        <button class="add-btn" id="add-btn" onclick="openCreateUser()"><i class="fas fa-user-plus"></i> Add Player</button>
+      </div>
+
+      <!-- Stats -->
+      <div class="stats-row" id="stats-row"></div>
+
+      <!-- Downline Table -->
+      <div class="data-card">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Account</th>
+              <th>Credit Ref.</th>
+              <th>Balance</th>
+              <th>Net Exposure</th>
+              <th>Available bal.</th>
+              <th>Ref. P/L</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="downline-body">
+            <tr><td colspan="8" class="empty">Loading...</td></tr>
+          </tbody>
+        </table>
+        <div class="pagination" id="pagination"></div>
+      </div>
+
+      <!-- Footer Actions -->
+      <div class="footer-actions">
+        <span class="fa-item"><i class="fas fa-money-bill"></i> Bank</span>
+        <span class="fa-item"><i class="fas fa-chart-line"></i> Betting Profit & Loss</span>
+        <span class="fa-item"><i class="fas fa-history"></i> Betting History</span>
+        <span class="fa-item"><i class="fas fa-user"></i> Profile</span>
+        <span class="fa-item"><i class="fas fa-cog"></i> Change Status</span>
+      </div>
+    </div>
+
+    <div id="view-area"></div>
+  </div>
+
+  <script>
+    let currentUser = null;
+    let allDownlineUsers = [];
+
+    // ===== Hierarchy =====
+    const PANEL_HIER = {
+      'SENIOR_AFFILIATE': { next: 'AFFILIATE', label: 'Add Affiliate' },
+      'AFFILIATE': { next: 'PLAYER', label: 'Add Player' },
+      'SUPER_AGENT': { next: 'MASTER_AGENT', label: 'Add Master Agent' },
+      'MASTER_AGENT': { next: 'PLAYER', label: 'Add Player' }
+    };
+    const COMMISSION_ROLES = ['SUPER_AGENT', 'MASTER_AGENT'];
+    const ROLE_SHORT = { OWNER:'OW', MOTHER_PANEL:'MP', WHITE_LABEL:'WL', SUPER_ADMIN:'SA', ADMIN:'AD', B2C_SUB_ADMIN:'B2C', B2B_SUB_ADMIN:'B2B', SENIOR_AFFILIATE:'SR', AFFILIATE:'AF', SUPER_AGENT:'SA', MASTER_AGENT:'MA', PLAYER:'PL' };
+
+    function toast(msg, type='success') {
+      const t = document.createElement('div');
+      t.className = `toast toast-${type}`;
+      t.textContent = msg;
+      document.body.appendChild(t);
+      setTimeout(()=>t.remove(), 3000);
+    }
+
+    function logout() { localStorage.clear(); window.location.href = '../../login.html'; }
+
+    function openModal(title, body, onConfirm) {
+      const o = document.createElement('div');
+      o.className = 'modal-overlay';
+      o.innerHTML = `<div class="modal-box"><h3>${title}</h3><div>${body}</div><div class="modal-actions"><button class="btn btn-cancel" id="mc">Cancel</button><button class="btn btn-primary" id="mk">Confirm</button></div></div>`;
+      document.body.appendChild(o);
+      o.querySelector('#mc').onclick = () => o.remove();
+      o.querySelector('#mk').onclick = async () => { await onConfirm(); };
+      o.onclick = e => { if (e.target === o) o.remove(); };
+      window.__modal = o;
+    }
+    function closeModal() { if (window.__modal) window.__modal.remove(); }
+
+    // ===== INIT =====
+    async function init() {
+      if (!localStorage.getItem('token')) { window.location.href='../../login.html'; return; }
+      const r = await API.Auth.me();
+      if (!r.success) { localStorage.clear(); window.location.href='../../login.html'; return; }
+      currentUser = r.data;
+
+      document.getElementById('username-display').textContent = currentUser.username.toUpperCase();
+      document.getElementById('role-short').textContent = ROLE_SHORT[currentUser.role] || currentUser.role.substring(0,2);
+      document.getElementById('balance-display').textContent = `BDT ${Number(currentUser.wallet?.balance||0).toFixed(2)}`;
+
+      // Set referral code
+      const refLink = `${window.location.origin}/signup?ref=${currentUser.referralCode || 'N/A'}`;
+      document.getElementById('ref-link').textContent = refLink;
+
+      // News
+      const news = await API.Messages.getImportant();
+      if (news.success && news.data && news.data.length > 0) {
+        const m = news.data[0];
+        document.getElementById('news-content').textContent = `Event : ${m.title} - ${m.content || ''}`;
+        document.getElementById('news-date').textContent = new Date(m.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+      }
+
+      // Set Add button label
+      const cfg = PANEL_HIER[currentUser.role];
+      const addBtn = document.getElementById('add-btn');
+      if (cfg) {
+        addBtn.innerHTML = `<i class="fas fa-user-plus"></i> ${cfg.label}`;
+        addBtn.style.display = '';
+      } else {
+        addBtn.style.display = 'none';
+      }
+
+      await refreshAll();
+    }
+
+    async function refreshAll() {
+      await Promise.all([loadStats(), loadDownline(), loadCounts()]);
+    }
+
+    async function loadCounts() {
+      try {
+        const [dep, wd] = await Promise.all([API.Banking.depositRequests('PENDING'), API.Banking.withdrawRequests('PENDING')]);
+        document.getElementById('dep-count').textContent = (dep.data||[]).length;
+        document.getElementById('wd-count').textContent = (wd.data||[]).length;
+      } catch(e){}
+    }
+
+    function copyRef() {
+      const text = document.getElementById('ref-link').textContent;
+      navigator.clipboard.writeText(text);
+      toast('Referral link copied!');
+    }
+
+    // ===== STATS =====
+    async function loadStats() {
+      const r = await API.Reports.mySummary();
+      const d = r.data || {};
+      const balance = Number(currentUser.wallet?.balance || 0);
+      const exposure = Number(d.totalStake || 0);
+      const isCom = COMMISSION_ROLES.includes(currentUser.role);
+
+      document.getElementById('stats-row').innerHTML = `
+        <div class="stat-card"><h4>Total Balance</h4><div class="val">BDT${balance.toFixed(2)}</div></div>
+        <div class="stat-card"><h4>Net Exposure</h4><div class="val red">BDT(${exposure.toFixed(2)})</div></div>
+        <div class="stat-card"><h4>Total Avail. Bal.</h4><div class="val">BDT${(balance-exposure).toFixed(2)}</div></div>
+        <div class="stat-card"><h4>Balance</h4><div class="val">BDT${balance.toFixed(2)}</div></div>
+        <div class="stat-card"><h4>Available balance</h4><div class="val">BDT${(balance-exposure).toFixed(2)}</div></div>
+        ${isCom ? `<div class="stat-card"><h4>Transferable P/L with Upline</h4><div class="val">BDT(${Number(d.totalCommissions||0).toFixed(2)})</div></div>` : '<div class="stat-card"><h4>Total Stake</h4><div class="val">BDT'+exposure.toFixed(2)+'</div></div>'}
+        <div class="stat-card"><h4>Total Users</h4><div class="val" id="total-users-stat">0</div></div>
+      `;
+    }
+
+    // ===== DOWNLINE =====
+    async function loadDownline() {
+      const r = await API.Users.downline();
+      allDownlineUsers = r.data || r.users || [];
+
+      const status = document.getElementById('status-filter')?.value || '';
+      const filtered = status ? allDownlineUsers.filter(u => (u.status||'').toLowerCase() === status) : allDownlineUsers;
+
+      renderDownlineTable(filtered);
+      const tu = document.getElementById('total-users-stat');
+      if (tu) tu.textContent = filtered.length;
+    }
+
+    function renderDownlineTable(users) {
+      const tbody = document.getElementById('downline-body');
+      if (!users.length) {
+        tbody.innerHTML = '<tr><td colspan="8" class="empty">No users found</td></tr>';
+        return;
+      }
+      tbody.innerHTML = users.map(u => {
+        const tag = ROLE_SHORT[u.role] || u.role.substring(0,2);
+        const balance = Number(u.wallet?.balance || 0);
+        const status = u.status || 'active';
+        return `<tr>
+          <td><span class="role-tag role-${u.role==='PLAYER'?'PL':u.role==='MASTER_AGENT'?'MA':'SA'}">${tag}</span><span class="username" onclick="viewUser(${u.id})">${u.username.toUpperCase()}</span></td>
+          <td><span class="credit-ref" onclick="openCreditRef(${u.id},'${u.username}')">0.00 <i class="fas fa-pencil-alt" style="font-size:10px;color:#999;"></i></span></td>
+          <td>${balance.toFixed(2)}</td>
+          <td class="neg">(0.00)</td>
+          <td>${balance.toFixed(2)}</td>
+          <td>0.00</td>
+          <td><span class="status-pill status-${u.isActive?'active':'inactive'}">${status.charAt(0).toUpperCase()+status.slice(1)}</span></td>
+          <td><div class="action-icons">
+            <button class="ic" title="Settings" onclick="openSettings(${u.id})"><i class="fas fa-cog"></i></button>
+            <button class="ic" title="Profile" onclick="viewUser(${u.id})"><i class="fas fa-user"></i></button>
+            <button class="ic" title="Deposit/Withdraw" onclick="openDepositTo(${u.id},'${u.username}')"><i class="fas fa-exchange-alt"></i></button>
+            <button class="ic" title="History" onclick="viewHistory(${u.id})"><i class="fas fa-list-alt"></i></button>
+          </div></td>
+        </tr>`;
+      }).join('');
+    }
+
+    function searchUsers(q) {
+      if (!q || q.length < 1) { renderDownlineTable(allDownlineUsers); return; }
+      const f = allDownlineUsers.filter(u => u.username.toLowerCase().includes(q.toLowerCase()));
+      renderDownlineTable(f);
+    }
+
+    // ===== ACTIONS =====
+    function openCreateUser() {
+      const cfg = PANEL_HIER[currentUser.role];
+      if (!cfg) return toast('Your role cannot create users','error');
+      const targetRole = cfg.next;
+      const showCommission = COMMISSION_ROLES.includes(targetRole);
+      openModal(cfg.label, `
+        <div class="info-banner"><i class="fas fa-info-circle"></i> Creating: <b>${targetRole.replace(/_/g,' ')}</b></div>
+        <div class="form-group"><label>Username</label><input class="input" id="m-u"></div>
+        <div class="form-group"><label>Password</label><input class="input" id="m-p" type="password"></div>
+        ${showCommission ? `<div class="form-group"><label>Commission Rate (%)</label><input class="input" id="m-c" type="number" value="0" min="0" max="100" step="0.1"></div>` : ''}
+      `, async () => {
+        const payload = {
+          username: document.getElementById('m-u').value,
+          password: document.getElementById('m-p').value,
+          roleToCreate: targetRole,
+          commissionRate: showCommission ? Number(document.getElementById('m-c').value || 0) : 0
+        };
+        const r = await API.Users.create(payload);
+        if (r.success) { toast('User created!'); closeModal(); loadDownline(); }
+        else {
+          const e = r.errors && r.errors.length ? r.errors.map(x => `${x.field}: ${x.message}`).join(' | ') : (r.message || 'Failed');
+          toast(e, 'error');
+        }
+      });
+    }
+
+    function openDepositTo(userId, username) {
+      openModal(`Transaction: ${username}`, `
+        <div class="form-group"><label>Type</label><select class="input" id="m-type"><option value="deposit">Deposit (Credit)</option><option value="withdraw">Withdraw (Debit)</option></select></div>
+        <div class="form-group"><label>Amount</label><input class="input" id="m-amt" type="number" placeholder="Enter amount"></div>
+        <div class="form-group"><label>Note (optional)</label><input class="input" id="m-note"></div>
+      `, async () => {
+        const type = document.getElementById('m-type').value;
+        const amt = Number(document.getElementById('m-amt').value);
+        const note = document.getElementById('m-note').value;
+        const r = type==='deposit' ? await API.Banking.depositManual(userId, amt, note) : await API.Banking.withdrawManual(userId, amt, note);
+        if (r.success) { toast(`${type==='deposit'?'Deposited':'Withdrew'} ${amt} successfully!`); closeModal(); loadDownline(); refreshAll(); }
+        else toast(r.message || 'Failed', 'error');
+      });
+    }
+
+    function openSettings(userId) {
+      const u = allDownlineUsers.find(x => x.id === userId);
+      if (!u) return;
+      openModal(`Settings: ${u.username}`, `
+        <div class="form-group"><label>Username</label><input class="input" value="${u.username}" disabled></div>
+        <div class="form-group"><label>New Password</label><input class="input" id="m-newpass" type="password" placeholder="Leave blank to skip"></div>
+        <div class="form-group"><label>Status</label><select class="input" id="m-status"><option value="active" ${u.status==='active'?'selected':''}>Active</option><option value="inactive" ${u.status==='inactive'?'selected':''}>Inactive</option><option value="blocked" ${u.status==='blocked'?'selected':''}>Blocked</option></select></div>
+        <div class="form-group"><label><input type="checkbox" id="m-betlock" ${u.isBetLocked?'checked':''}> Bet Lock</label></div>
+      `, async () => {
+        const newPass = document.getElementById('m-newpass').value;
+        const status = document.getElementById('m-status').value;
+        if (newPass) await API.Users.changeUserPassword(userId, newPass);
+        if (status !== u.status) await API.Users.changeStatus(userId, status);
+        const betLock = document.getElementById('m-betlock').checked;
+        if (betLock !== u.isBetLocked) await API.Users.toggleBetLock(userId);
+        toast('Settings updated!'); closeModal(); loadDownline();
+      });
+    }
+
+    function openCreditRef(userId, username) {
+      openModal(`Credit Reference: ${username}`, `
+        <div class="info-banner"><i class="fas fa-info-circle"></i> Set credit limit/reference (display only)</div>
+        <div class="form-group"><label>Credit Reference</label><input class="input" id="m-cref" type="number" value="0"></div>
+        <div class="form-group"><label>Reason</label><input class="input" id="m-cnote"></div>
+      `, async () => {
+        toast('Credit reference noted (UI only)');
+        closeModal();
+      });
+    }
+
+    async function viewUser(userId) {
+      const r = await API.Users.getById(userId);
+      if (!r.success) return toast(r.message || 'Not found', 'error');
+      const u = r.data;
+      openModal(`Profile: ${u.username}`, `
+        <div style="display:grid;grid-template-columns:auto 1fr;gap:8px 12px;font-size:13px;">
+          <b>ID:</b><span>#${u.id}</span>
+          <b>Username:</b><span>${u.username}</span>
+          <b>Role:</b><span>${u.role}</span>
+          <b>Status:</b><span>${u.status}</span>
+          <b>Balance:</b><span>BDT ${Number(u.wallet?.balance||0).toFixed(2)}</span>
+          <b>Phone:</b><span>${u.phone||'-'}</span>
+          <b>Email:</b><span>${u.email||'-'}</span>
+          <b>Created:</b><span>${new Date(u.createdAt).toLocaleString()}</span>
+          <b>Last Login:</b><span>${u.lastLoginAt?new Date(u.lastLoginAt).toLocaleString():'Never'}</span>
+        </div>
+      `, () => closeModal());
+    }
+
+    async function viewHistory(userId) {
+      const r = await API.Banking.ledger(1, 30, '');
+      const txns = (r.data || []).filter(t => t.userId === userId);
+      const view = document.getElementById('view-area');
+      document.getElementById('home-view').style.display = 'none';
+      view.style.display = 'block';
+      view.innerHTML = `
+        <div class="data-card" style="padding:15px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;">
+            <h3>Transaction History — User #${userId}</h3>
+            <button class="btn btn-cancel" onclick="goHome()">Back</button>
+          </div>
+          ${txns.length ? `<table class="data-table"><thead><tr><th>Type</th><th>Amount</th><th>Before</th><th>After</th><th>Date</th></tr></thead><tbody>${txns.map(t=>`<tr><td>${t.type}</td><td>${t.amount}</td><td>${t.balanceBefore||'-'}</td><td>${t.balanceAfter||'-'}</td><td>${new Date(t.createdAt).toLocaleString()}</td></tr>`).join('')}</tbody></table>` : '<div class="empty">No transactions</div>'}
+        </div>`;
+    }
+
+    function goHome() {
+      document.getElementById('home-view').style.display = 'block';
+      document.getElementById('view-area').style.display = 'none';
+      document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+      document.querySelector('.nav-item[data-tab="downline"]').classList.add('active');
+    }
+
+    // ===== DROPDOWN NAV LINKS =====
+    document.querySelectorAll('.nav-dropdown a').forEach(link => {
+      link.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        const id = link.dataset.tab;
+        document.querySelectorAll('.nav-item').forEach(t => t.classList.remove('active'));
+        await handleTab(id);
+      });
+    });
+
+    // ===== TAB NAVIGATION =====
+    document.querySelectorAll('.nav-item').forEach(tab => {
+      tab.addEventListener('click', async (e) => {
+        if (tab.classList.contains('dropdown')) return; // dropdown parent doesn't navigate
+        const id = tab.dataset.tab;
+        if (!id) return;
+        document.querySelectorAll('.nav-item').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        await handleTab(id);
+      });
+    });
+
+    async function handleTab(id) {
+        if (id === 'downline') { goHome(); loadDownline(); return; }
+
+        const home = document.getElementById('home-view');
+        const view = document.getElementById('view-area');
+        home.style.display = 'none';
+        view.style.display = 'block';
+        view.innerHTML = '<div class="data-card" style="padding:30px;"><div class="empty"><i class="fas fa-spinner fa-spin"></i> Loading...</div></div>';
+
+        if (id === 'account') {
+          const u = currentUser;
+          view.innerHTML = `<div class="data-card" style="padding:25px;">
+            <h3 style="margin-bottom:20px;border-bottom:2px solid #f7b112;padding-bottom:10px;">My Account</h3>
+            <div class="stats-row" style="grid-template-columns:repeat(4,1fr);">
+              <div class="stat-card"><h4>Username</h4><div class="val">${u.username}</div></div>
+              <div class="stat-card"><h4>Role</h4><div class="val">${u.role}</div></div>
+              <div class="stat-card"><h4>Balance</h4><div class="val">BDT ${Number(u.wallet?.balance||0).toFixed(2)}</div></div>
+              <div class="stat-card"><h4>Status</h4><div class="val">${u.status||'active'}</div></div>
+              <div class="stat-card"><h4>Phone</h4><div class="val">${u.phone||'-'}</div></div>
+              <div class="stat-card"><h4>Email</h4><div class="val">${u.email||'-'}</div></div>
+              <div class="stat-card"><h4>Referral Code</h4><div class="val">${u.referralCode||'-'}</div></div>
+              <div class="stat-card"><h4>Last Login</h4><div class="val" style="font-size:13px;">${u.lastLoginAt?new Date(u.lastLoginAt).toLocaleDateString():'Never'}</div></div>
+            </div>
+          </div>`;
+        }
+        else if (id === 'report') {
+          renderReport('downline');
+        }
+        else if (id === 'betlist' || id === 'betlive') {
+          const r = id==='betlive' ? await API.Bets.live() : await API.Bets.list(1,50);
+          const bets = r.data || [];
+          view.innerHTML = `<div class="data-card" style="padding:15px;">
+            <h3 style="margin-bottom:15px;">${id==='betlive'?'Live Bets':'Bet List'}</h3>
+            ${bets.length?`<table class="data-table"><thead><tr><th>User</th><th>Match</th><th>Selection</th><th>Odds</th><th>Stake</th><th>Status</th></tr></thead><tbody>${bets.map(b=>`<tr><td>${b.User?.username||'-'}</td><td>${b.Match?b.Match.teamA+' vs '+b.Match.teamB:'-'}</td><td>${b.selection||'-'}</td><td>${b.odds}</td><td>${b.stake}</td><td><span class="status-pill status-${b.status==='WON'?'active':'inactive'}">${b.status}</span></td></tr>`).join('')}</tbody></table>`:'<div class="empty">No bets</div>'}
+          </div>`;
+        }
+        else if (id === 'risk') {
+          renderRiskManagement();
+        }
+        else if (id === 'banking') {
+          const r = await API.Banking.ledger(1,30); const txns = r.data || [];
+          view.innerHTML = `<div class="data-card" style="padding:15px;">
+            <h3 style="margin-bottom:15px;">Banking Ledger</h3>
+            ${txns.length?`<table class="data-table"><thead><tr><th>Type</th><th>Amount</th><th>Before</th><th>After</th><th>Date</th></tr></thead><tbody>${txns.map(t=>`<tr><td>${t.type}</td><td>${t.amount}</td><td>${t.balanceBefore||'-'}</td><td>${t.balanceAfter||'-'}</td><td>${new Date(t.createdAt).toLocaleDateString()}</td></tr>`).join('')}</tbody></table>`:'<div class="empty">No transactions</div>'}
+          </div>`;
+        }
+        else if (id === 'banks') {
+          const r = await API.Banking.methods(); const m = r.data || [];
+          view.innerHTML = `<div class="data-card" style="padding:15px;">
+            <h3 style="margin-bottom:15px;">Banking Methods</h3>
+            ${m.length?`<table class="data-table"><thead><tr><th>Name</th><th>Type</th><th>Account</th><th>Status</th></tr></thead><tbody>${m.map(b=>`<tr><td>${b.name}</td><td><span class="role-tag role-MA">${b.type}</span></td><td>${b.accountNumber}</td><td><span class="status-pill status-${b.isActive?'active':'inactive'}">${b.isActive?'Active':'Inactive'}</span></td></tr>`).join('')}</tbody></table>`:'<div class="empty">No banks</div>'}
+          </div>`;
+        }
+        else if (id === 'dep-req') {
+          const r = await API.Banking.depositRequests('PENDING'); const reqs = r.data || [];
+          view.innerHTML = `<div class="data-card" style="padding:15px;">
+            <h3 style="margin-bottom:15px;">Pending Deposit Requests</h3>
+            ${reqs.length?`<table class="data-table"><thead><tr><th>User</th><th>Amount</th><th>Method</th><th>TxnID</th><th>Action</th></tr></thead><tbody>${reqs.map(r=>`<tr><td>${r.User?.username||r.userId}</td><td>BDT ${r.amount}</td><td>${r.methodName||'-'}</td><td>${r.transactionId||'-'}</td><td><button class="btn btn-success" onclick="approveDep(${r.id})">Approve</button> <button class="btn btn-danger" onclick="rejectDep(${r.id})">Reject</button></td></tr>`).join('')}</tbody></table>`:'<div class="empty">No pending requests</div>'}
+          </div>`;
+        }
+        else if (id === 'settings') {
+          view.innerHTML = `<div class="data-card" style="padding:25px;">
+            <h3 style="margin-bottom:20px;border-bottom:2px solid #f7b112;padding-bottom:10px;">Admin Settings</h3>
+            <div style="max-width:400px;">
+              <div class="form-group"><label>Current Password</label><input class="input" id="s-old" type="password"></div>
+              <div class="form-group"><label>New Password</label><input class="input" id="s-new" type="password"></div>
+              <button class="btn btn-primary" onclick="chgPass()">Change Password</button>
+            </div>
+          </div>`;
+        }
+        else if (id === 'wallet-deposit') { renderWalletDeposit(); }
+        else if (id === 'wallet-withdraw') { renderWalletWithdraw(); }
+        else if (id === 'wallet-deposit-history') { renderWalletHistory('DEPOSIT'); }
+        else if (id === 'wallet-withdraw-history') { renderWalletHistory('WITHDRAW'); }
+    }
+
+    // ===== WALLET MANAGEMENT =====
+    async function renderWalletDeposit() {
+      const view = document.getElementById('view-area');
+      const dl = await API.Users.downline();
+      const users = dl.data || [];
+
+      view.innerHTML = `<div class="data-card" style="padding:25px;">
+        <h3 style="margin-bottom:20px;border-bottom:2px solid #f7b112;padding-bottom:10px;"><i class="fas fa-wallet"></i> Wallet Deposit — Credit Downline</h3>
+        <div class="info-banner"><i class="fas fa-info-circle"></i> Deposit chips from your wallet to a downline user. Your balance: <b>BDT ${Number(currentUser.wallet?.balance||0).toFixed(2)}</b></div>
+        <div style="max-width:500px;">
+          <div class="form-group">
+            <label>Select User</label>
+            <select class="input" id="wd-user">
+              <option value="">-- Select downline user --</option>
+              ${users.map(u => `<option value="${u.id}">${u.username} (${u.role}) — Balance: BDT ${Number(u.wallet?.balance||0).toFixed(2)}</option>`).join('')}
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Amount (BDT)</label>
+            <input class="input" id="wd-amount" type="number" min="1" placeholder="Enter amount">
+          </div>
+          <div class="form-group">
+            <label>Note (optional)</label>
+            <input class="input" id="wd-note" placeholder="Reason or reference">
+          </div>
+          <button class="btn btn-success" onclick="submitWalletDeposit()"><i class="fas fa-arrow-down"></i> Deposit Now</button>
+        </div>
+      </div>`;
+    }
+
+    async function submitWalletDeposit() {
+      const userId = Number(document.getElementById('wd-user').value);
+      const amount = Number(document.getElementById('wd-amount').value);
+      const note = document.getElementById('wd-note').value;
+      if (!userId) return toast('Please select a user', 'error');
+      if (!amount || amount <= 0) return toast('Enter a valid amount', 'error');
+
+      const r = await API.Banking.depositManual(userId, amount, note);
+      if (r.success) {
+        toast(`Deposited BDT ${amount} successfully!`);
+        refreshAll();
+        renderWalletDeposit();
+      } else {
+        toast(r.message || 'Deposit failed', 'error');
+      }
+    }
+
+    async function renderWalletWithdraw() {
+      const view = document.getElementById('view-area');
+      const dl = await API.Users.downline();
+      const users = dl.data || [];
+
+      view.innerHTML = `<div class="data-card" style="padding:25px;">
+        <h3 style="margin-bottom:20px;border-bottom:2px solid #f7b112;padding-bottom:10px;"><i class="fas fa-wallet"></i> Wallet Withdraw — Debit Downline</h3>
+        <div class="info-banner"><i class="fas fa-info-circle"></i> Withdraw chips from a downline user back to your wallet.</div>
+        <div style="max-width:500px;">
+          <div class="form-group">
+            <label>Select User</label>
+            <select class="input" id="ww-user">
+              <option value="">-- Select downline user --</option>
+              ${users.map(u => `<option value="${u.id}">${u.username} (${u.role}) — Balance: BDT ${Number(u.wallet?.balance||0).toFixed(2)}</option>`).join('')}
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Amount (BDT)</label>
+            <input class="input" id="ww-amount" type="number" min="1" placeholder="Enter amount">
+          </div>
+          <div class="form-group">
+            <label>Note (optional)</label>
+            <input class="input" id="ww-note" placeholder="Reason or reference">
+          </div>
+          <button class="btn btn-danger" onclick="submitWalletWithdraw()"><i class="fas fa-arrow-up"></i> Withdraw Now</button>
+        </div>
+      </div>`;
+    }
+
+    async function submitWalletWithdraw() {
+      const userId = Number(document.getElementById('ww-user').value);
+      const amount = Number(document.getElementById('ww-amount').value);
+      const note = document.getElementById('ww-note').value;
+      if (!userId) return toast('Please select a user', 'error');
+      if (!amount || amount <= 0) return toast('Enter a valid amount', 'error');
+
+      const r = await API.Banking.withdrawManual(userId, amount, note);
+      if (r.success) {
+        toast(`Withdrew BDT ${amount} successfully!`);
+        refreshAll();
+        renderWalletWithdraw();
+      } else {
+        toast(r.message || 'Withdraw failed', 'error');
+      }
+    }
+
+    async function renderWalletHistory(type) {
+      const view = document.getElementById('view-area');
+      const today = new Date().toISOString().split('T')[0];
+      const tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0];
+
+      view.innerHTML = `<div class="data-card" style="padding:25px;">
+        <h3 style="margin-bottom:15px;border-bottom:2px solid #f7b112;padding-bottom:10px;"><i class="fas fa-history"></i> Wallet ${type==='DEPOSIT'?'Deposit':'Withdraw'} History</h3>
+
+        <div style="background:#f9fafb;padding:12px;border-radius:6px;margin-bottom:15px;display:grid;grid-template-columns:auto 1fr auto 1fr auto auto;gap:10px;align-items:end;">
+          <label style="font-size:12px;font-weight:600;color:#555;">Bank</label>
+          <select class="input" id="wh-bank" style="margin:0;"><option value="ACTIVE">ACTIVE</option><option value="ALL">ALL</option><option value="INACTIVE">INACTIVE</option></select>
+          <label style="font-size:12px;font-weight:600;color:#555;">Period</label>
+          <input class="input" id="wh-from" type="date" value="${today}" style="margin:0;">
+          <input class="input" id="wh-to" type="date" value="${tomorrow}" style="margin:0;">
+          <button class="btn btn-primary" onclick="loadWalletHistory('${type}')"><i class="fas fa-search"></i> Search</button>
+        </div>
+
+        <div id="wallet-history-results"><div class="empty">Click Search to load history</div></div>
+      </div>`;
+
+      // Auto-load on first open
+      loadWalletHistory(type);
+    }
+
+    async function loadWalletHistory(type) {
+      const container = document.getElementById('wallet-history-results');
+      container.innerHTML = '<div class="empty"><i class="fas fa-spinner fa-spin"></i> Loading...</div>';
+
+      const r = await API.Banking.ledger(1, 100);
+      let txns = (r.data || []).filter(t => t.type === type);
+
+      const fromDate = document.getElementById('wh-from')?.value;
+      const toDate = document.getElementById('wh-to')?.value;
+      if (fromDate) txns = txns.filter(t => new Date(t.createdAt) >= new Date(fromDate));
+      if (toDate) txns = txns.filter(t => new Date(t.createdAt) <= new Date(toDate + 'T23:59:59'));
+
+      if (!txns.length) {
+        container.innerHTML = '<div class="empty">No transactions found</div>';
+        return;
+      }
+
+      const total = txns.reduce((sum, t) => sum + Number(t.amount || 0), 0);
+      container.innerHTML = `
+        <div style="display:flex;justify-content:space-between;margin-bottom:10px;padding:10px;background:#fef3c7;border-radius:4px;">
+          <span><b>${txns.length}</b> ${type === 'DEPOSIT' ? 'deposits' : 'withdrawals'}</span>
+          <span><b>Total: BDT ${total.toFixed(2)}</b></span>
+        </div>
+        <table class="data-table">
+          <thead>
+            <tr><th>ID</th><th>User</th><th>Amount</th><th>Balance Before</th><th>Balance After</th><th>Description</th><th>Date</th></tr>
+          </thead>
+          <tbody>
+            ${txns.map(t => `<tr>
+              <td>#${t.id}</td>
+              <td>${t.User?.username || `User#${t.userId}`}</td>
+              <td style="font-weight:600;color:${type==='DEPOSIT'?'#28a745':'#dc3545'};">BDT ${Number(t.amount).toFixed(2)}</td>
+              <td>BDT ${Number(t.balanceBefore || 0).toFixed(2)}</td>
+              <td>BDT ${Number(t.balanceAfter || 0).toFixed(2)}</td>
+              <td style="font-size:12px;color:#666;">${t.description || '-'}</td>
+              <td style="font-size:12px;">${new Date(t.createdAt).toLocaleString()}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      `;
+    }
+
+    async function approveDep(id) { const r=await API.Banking.approveDeposit(id); r.success?(toast('Approved!'),refreshAll()):toast(r.message,'error'); }
+    async function rejectDep(id) { const r=await API.Banking.rejectDeposit(id); r.success?(toast('Rejected'),refreshAll()):toast(r.message,'error'); }
+    async function chgPass() { const r=await API.Auth.changePassword(document.getElementById('s-old').value, document.getElementById('s-new').value); r.success?toast('Password changed!'):toast(r.message,'error'); }
+
+    // ===== RISK MANAGEMENT =====
+    let riskTab = 'matched';
+    async function renderRiskManagement() {
+      const view = document.getElementById('view-area');
+      const [riskRes, liveRes, exposureRes] = await Promise.all([
+        API.Bets.riskSummary(),
+        API.Bets.live(),
+        API.Bets.liveExposure()
+      ]);
+      const risk = riskRes.data || {};
+      const liveBets = liveRes.data || [];
+      const exposures = exposureRes.data || [];
+
+      // Top 10 Players (by Matched Amount = Total Stake)
+      const playerMatched = {};
+      const playerExposure = {};
+      liveBets.forEach(b => {
+        const uname = b.User?.username || `User#${b.userId}`;
+        const uid = b.User?.id || b.userId;
+        if (!playerMatched[uid]) playerMatched[uid] = { uid: uname, stake: 0, exposure: 0 };
+        playerMatched[uid].stake += Number(b.stake || 0);
+        playerMatched[uid].exposure += Number(b.liability || 0);
+      });
+      const matchedList = Object.values(playerMatched).sort((a,b) => b.stake - a.stake).slice(0, 10);
+      const exposureList = Object.values(playerMatched).sort((a,b) => b.exposure - a.exposure).slice(0, 10);
+
+      // Group bets by Match for Match Odds sections
+      const matchGroups = {};
+      liveBets.forEach(b => {
+        const key = b.matchId;
+        if (!matchGroups[key]) {
+          matchGroups[key] = {
+            sport: b.Match?.League?.name || 'Cricket',
+            date: b.Match?.startTime ? new Date(b.Match.startTime).toLocaleDateString() : '-',
+            event: b.Match ? `${b.Match.teamA} v ${b.Match.teamB}` : `Match #${b.matchId}`,
+            bets: []
+          };
+        }
+        matchGroups[key].bets.push(b);
+      });
+
+      const matchOddsRows = Object.values(matchGroups).map(m => {
+        const pl1 = m.bets.filter(b => b.selection?.includes(m.event.split(' v ')[0])).reduce((s,b) => s + Number(b.stake), 0);
+        const plX = m.bets.filter(b => b.selection?.toLowerCase().includes('draw')).reduce((s,b) => s + Number(b.stake), 0);
+        const pl2 = m.bets.filter(b => b.selection?.includes(m.event.split(' v ')[1])).reduce((s,b) => s + Number(b.stake), 0);
+        const downlinePL = pl1 + plX + pl2;
+        return { ...m, pl1, plX, pl2, downlinePL };
+      });
+
+      view.innerHTML = `
+        <h3 style="padding:0 5px 12px;border-bottom:none;font-size:18px;">Risk Management Summary</h3>
+
+        <div class="risk-summary-grid">
+          <!-- Top 10 Players -->
+          <div class="risk-section">
+            <div class="tabs-bar">
+              <button class="tab-btn ${riskTab==='matched'?'active':''}" onclick="riskTab='matched';renderRiskManagement()">Top 10 Matched Amount Player</button>
+              <button class="tab-btn ${riskTab==='exposure'?'active':''}" onclick="riskTab='exposure';renderRiskManagement()">Top 10 Exposure Player</button>
+            </div>
+            <table class="risk-table">
+              <thead><tr><th>UID</th><th style="text-align:right;">Exposure</th><th style="text-align:right;">Matched Amount ▼</th></tr></thead>
+              <tbody>
+                ${(riskTab==='matched'?matchedList:exposureList).length ?
+                  (riskTab==='matched'?matchedList:exposureList).map(p => `<tr><td>${p.uid}</td><td style="text-align:right;color:#dc3545;">${p.exposure.toFixed(2)}</td><td style="text-align:right;font-weight:600;">${p.stake.toFixed(2)}</td></tr>`).join('')
+                  : '<tr><td colspan="3" class="no-data">No data</td></tr>'}
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Horse Racing & Greyhound Racing -->
+          <div class="risk-section">
+            <div class="risk-section-header" style="background:#4b5563;">Horse Racing & Greyhound Racing</div>
+            <table class="risk-table">
+              <thead><tr><th>Type</th><th>Country</th><th>Events</th><th style="text-align:right;">Matched Amount</th></tr></thead>
+              <tbody><tr><td colspan="4" class="no-data">No data</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Match Odds Section 1 -->
+        <div class="risk-section">
+          <div class="risk-section-header">
+            <span>Match Odds</span>
+            <div class="actions">
+              <button onclick="renderRiskManagement()"><i class="fas fa-sync"></i></button>
+              <button onclick="downloadRisk('match-odds')"><i class="fas fa-download"></i> Download</button>
+            </div>
+          </div>
+          <table class="risk-table">
+            <thead>
+              <tr>
+                <th rowspan="2">Sports</th>
+                <th rowspan="2">Market Date</th>
+                <th rowspan="2">Event/Market Name</th>
+                <th colspan="3" class="pl-header">Player P/L</th>
+                <th rowspan="2" class="dl-header">Downline P/L</th>
+              </tr>
+              <tr><th class="pl-header" style="text-align:center;">1</th><th class="pl-header" style="text-align:center;">X</th><th class="pl-header" style="text-align:center;">2</th></tr>
+            </thead>
+            <tbody>
+              ${matchOddsRows.length ? matchOddsRows.map(m => `<tr>
+                <td>${m.sport}</td><td>${m.date}</td><td>${m.event}</td>
+                <td style="text-align:center;">${m.pl1.toFixed(2)}</td>
+                <td style="text-align:center;">${m.plX.toFixed(2)}</td>
+                <td style="text-align:center;">${m.pl2.toFixed(2)}</td>
+                <td style="text-align:center;font-weight:600;color:${m.downlinePL>=0?'#28a745':'#dc3545'};">${m.downlinePL.toFixed(2)}</td>
+              </tr>`).join('') : '<tr><td colspan="7" class="no-data">No data</td></tr>'}
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Sports Book -->
+        <div class="risk-section">
+          <div class="risk-section-header">
+            <span>Sports Book</span>
+            <div class="actions"><button onclick="renderRiskManagement()"><i class="fas fa-sync"></i></button></div>
+          </div>
+          <table class="risk-table">
+            <thead><tr><th>Sports</th><th>Market Date</th><th>Event/Market Name</th><th style="text-align:right;">Matched Amount</th></tr></thead>
+            <tbody><tr><td colspan="4" class="no-data">No Data</td></tr></tbody>
+          </table>
+        </div>
+
+        <!-- Premium -->
+        <div class="risk-section">
+          <div class="risk-section-header">
+            <span>Premium</span>
+            <div class="actions"><button onclick="renderRiskManagement()"><i class="fas fa-sync"></i></button></div>
+          </div>
+          <table class="risk-table">
+            <thead><tr><th>Sports</th><th>Market Date</th><th>Event/Market Name</th><th style="text-align:right;">Matched Amount</th></tr></thead>
+            <tbody><tr><td colspan="4" class="no-data">No Data</td></tr></tbody>
+          </table>
+        </div>
+
+        <!-- Binary -->
+        <div class="risk-section">
+          <div class="risk-section-header">
+            <span>Binary</span>
+            <div class="actions"><button onclick="renderRiskManagement()"><i class="fas fa-sync"></i></button></div>
+          </div>
+          <table class="risk-table">
+            <thead><tr><th>Sports</th><th>Market Date</th><th>Event/Market Name</th><th class="pl-header" style="text-align:center;">Player P/L</th><th class="dl-header" style="text-align:center;">Books</th></tr></thead>
+            <tbody><tr><td colspan="5" class="no-data">No Data</td></tr></tbody>
+          </table>
+        </div>
+
+        <!-- Other Markets -->
+        <div class="risk-section">
+          <div class="risk-section-header">
+            <span>Other Markets</span>
+            <div class="actions"><button onclick="renderRiskManagement()"><i class="fas fa-sync"></i></button></div>
+          </div>
+          <table class="risk-table">
+            <thead><tr><th>Sports</th><th>Market Date</th><th>Event/Market Name</th><th style="text-align:right;">Matched Amount</th></tr></thead>
+            <tbody><tr><td colspan="4" class="no-data">No Data</td></tr></tbody>
+          </table>
+        </div>
+
+        <!-- Fancy bet -->
+        <div class="risk-section">
+          <div class="risk-section-header">
+            <span>Fancy bet</span>
+            <div class="actions">
+              <button onclick="renderRiskManagement()"><i class="fas fa-sync"></i></button>
+              <button onclick="downloadRisk('fancy')"><i class="fas fa-download"></i> Download</button>
+            </div>
+          </div>
+          <table class="risk-table">
+            <thead>
+              <tr>
+                <th rowspan="2">Sports</th>
+                <th rowspan="2">Market Date</th>
+                <th rowspan="2">Event/Market Name</th>
+                <th colspan="2" class="pl-header">Player P/L</th>
+                <th rowspan="2" class="dl-header">Downline P/L</th>
+              </tr>
+              <tr><th class="pl-header" style="text-align:center;">MIN</th><th class="pl-header" style="text-align:center;">MAX</th></tr>
+            </thead>
+            <tbody><tr><td colspan="6" class="no-data">No Data</td></tr></tbody>
+          </table>
+        </div>
+
+        <!-- Quick Stats Footer -->
+        <div class="stats-row" style="grid-template-columns:repeat(4,1fr);margin-top:15px;">
+          <div class="stat-card"><h4>Active Bets</h4><div class="val">${risk.activeBets||0}</div></div>
+          <div class="stat-card"><h4>Total Stake</h4><div class="val">BDT ${Number(risk.totalStake||0).toFixed(2)}</div></div>
+          <div class="stat-card"><h4>Total Liability</h4><div class="val red">BDT ${Number(risk.totalLiability||0).toFixed(2)}</div></div>
+          <div class="stat-card"><h4>Max Limit</h4><div class="val">BDT ${Number(risk.maxLiabilityLimit||0).toFixed(2)}</div></div>
+        </div>
+      `;
+    }
+
+    function downloadRisk(type) {
+      toast(`Download ${type} report — feature coming soon`);
+    }
+
+    // ===== MY REPORT (Two Types) =====
+    function renderReport(type) {
+      const view = document.getElementById('view-area');
+      const today = new Date().toISOString().split('T')[0];
+      const reportTitle = type === 'downline' ? 'Profit/Loss Report by Downline' : 'Profit/Loss Report by Market';
+
+      view.innerHTML = `<div class="data-card" style="padding:25px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #f7b112;padding-bottom:10px;margin-bottom:15px;">
+          <h3 style="margin:0;">${reportTitle}</h3>
+          <div style="display:flex;gap:8px;">
+            <button class="btn ${type==='downline'?'btn-primary':'btn-cancel'}" onclick="renderReport('downline')"><i class="fas fa-users"></i> By Downline</button>
+            <button class="btn ${type==='market'?'btn-primary':'btn-cancel'}" onclick="renderReport('market')"><i class="fas fa-chart-line"></i> By Market</button>
+          </div>
+        </div>
+
+        <!-- Filter Form -->
+        <div style="background:#f9fafb;padding:15px;border-radius:6px;margin-bottom:15px;display:grid;grid-template-columns:repeat(4,1fr);gap:12px;align-items:end;">
+          <div class="form-group" style="margin:0;">
+            <label>Sports</label>
+            <select class="input" id="rep-sports">
+              <option value="">All</option>
+              <option value="cricket">Cricket</option>
+              <option value="football">Football</option>
+              <option value="tennis">Tennis</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin:0;">
+            <label>Time Zone</label>
+            <select class="input" id="rep-tz"><option value="GMT+6">GMT+6 (BD)</option><option value="GMT+5:30">GMT+5:30 (IN)</option><option value="GMT+0">GMT+0 (UTC)</option></select>
+          </div>
+          <div class="form-group" style="margin:0;">
+            <label>Period (Start)</label>
+            <input class="input" id="rep-from" type="date" value="${today}">
+          </div>
+          <div class="form-group" style="margin:0;">
+            <label>Period (End)</label>
+            <input class="input" id="rep-to" type="date" value="${today}">
+          </div>
+        </div>
+
+        <!-- Quick Filter Buttons -->
+        <div style="display:flex;gap:8px;margin-bottom:15px;">
+          <button class="btn btn-cancel" onclick="setReportPeriod('today')">Just For Today</button>
+          <button class="btn btn-cancel" onclick="setReportPeriod('yesterday')">From Yesterday</button>
+          <button class="btn btn-cancel" onclick="setReportPeriod('week')">This Week</button>
+          <button class="btn btn-cancel" onclick="setReportPeriod('month')">This Month</button>
+          <button class="btn btn-primary" onclick="getReportPL('${type}')" style="margin-left:auto;"><i class="fas fa-search"></i> Get P & L</button>
+        </div>
+
+        <!-- Results Container -->
+        <div id="report-results">
+          <div class="empty">Click "Get P & L" to view report</div>
+        </div>
+      </div>`;
+    }
+
+    function setReportPeriod(period) {
+      const today = new Date();
+      const fmt = d => d.toISOString().split('T')[0];
+      let from = today, to = today;
+      if (period === 'today') { from = today; to = today; }
+      else if (period === 'yesterday') { const y = new Date(today); y.setDate(y.getDate()-1); from = y; to = today; }
+      else if (period === 'week') { const w = new Date(today); w.setDate(w.getDate()-7); from = w; to = today; }
+      else if (period === 'month') { const m = new Date(today); m.setMonth(m.getMonth()-1); from = m; to = today; }
+      document.getElementById('rep-from').value = fmt(from);
+      document.getElementById('rep-to').value = fmt(to);
+    }
+
+    async function getReportPL(type) {
+      const sports = document.getElementById('rep-sports').value;
+      const from = document.getElementById('rep-from').value;
+      const to = document.getElementById('rep-to').value;
+      const container = document.getElementById('report-results');
+      container.innerHTML = '<div class="empty"><i class="fas fa-spinner fa-spin"></i> Generating report...</div>';
+
+      if (type === 'downline') {
+        // Profit/Loss by Downline — show each downline user with their stats
+        const r = await API.Users.downline();
+        const users = r.data || [];
+        const summary = await API.Reports.mySummary();
+        const sd = summary.data || {};
+
+        let html = `
+          <div class="stats-row" style="grid-template-columns:repeat(5,1fr);margin-bottom:15px;">
+            <div class="stat-card"><h4>Total Downline</h4><div class="val">${users.length}</div></div>
+            <div class="stat-card"><h4>Total Bets</h4><div class="val">${sd.totalBets||0}</div></div>
+            <div class="stat-card"><h4>Won</h4><div class="val" style="color:#28a745;">${sd.wonBets||0}</div></div>
+            <div class="stat-card"><h4>Lost</h4><div class="val" style="color:#dc3545;">${sd.lostBets||0}</div></div>
+            <div class="stat-card"><h4>Net P/L</h4><div class="val" style="color:${(sd.profit||0)>=0?'#28a745':'#dc3545'};">BDT ${Number(sd.profit||0).toFixed(2)}</div></div>
+          </div>`;
+
+        if (users.length) {
+          // Fetch report for each downline user
+          const rows = [];
+          for (const u of users) {
+            const ur = await API.Reports.userReport(u.id).catch(()=>({success:false}));
+            const ud = ur.success ? ur.data : {totalBets:0,wonBets:0,lostBets:0,totalStake:0,totalPayout:0,profit:0};
+            rows.push({u, ud});
+          }
+          html += `<table class="data-table"><thead><tr><th>User</th><th>Role</th><th>Bets</th><th>Won</th><th>Lost</th><th>Stake</th><th>Payout</th><th>P/L</th></tr></thead><tbody>${rows.map(({u,ud})=>`
+            <tr>
+              <td><b>${u.username}</b></td>
+              <td><span class="role-tag role-${u.role==='PLAYER'?'PL':'MA'}">${ROLE_SHORT[u.role]||u.role.substring(0,2)}</span></td>
+              <td>${ud.totalBets||0}</td>
+              <td style="color:#28a745;">${ud.wonBets||0}</td>
+              <td style="color:#dc3545;">${ud.lostBets||0}</td>
+              <td>BDT ${Number(ud.totalStake||0).toFixed(2)}</td>
+              <td>BDT ${Number(ud.totalPayout||0).toFixed(2)}</td>
+              <td style="color:${(ud.profit||0)>=0?'#28a745':'#dc3545'};font-weight:bold;">BDT ${Number(ud.profit||0).toFixed(2)}</td>
+            </tr>`).join('')}</tbody></table>`;
+        } else {
+          html += '<div class="empty">No downline users to report</div>';
+        }
+
+        container.innerHTML = html;
+      } else {
+        // Profit/Loss by Market — group bets by match/market
+        const r = await API.Bets.list(1, 200);
+        let bets = r.data || [];
+        if (sports) bets = bets.filter(b => (b.Match?.League?.name||'').toLowerCase().includes(sports));
+        if (from) bets = bets.filter(b => new Date(b.createdAt) >= new Date(from));
+        if (to) bets = bets.filter(b => new Date(b.createdAt) <= new Date(to + 'T23:59:59'));
+
+        const byMarket = {};
+        bets.forEach(b => {
+          const key = b.Match ? `${b.Match.teamA} vs ${b.Match.teamB}` : `Match #${b.matchId}`;
+          if (!byMarket[key]) byMarket[key] = { match: key, bets:0, won:0, lost:0, stake:0, payout:0, pl:0 };
+          byMarket[key].bets++;
+          byMarket[key].stake += Number(b.stake || 0);
+          if (b.status === 'WON') { byMarket[key].won++; byMarket[key].payout += Number(b.potentialWin||0); }
+          else if (b.status === 'LOST') byMarket[key].lost++;
+          byMarket[key].pl = byMarket[key].stake - byMarket[key].payout;
+        });
+
+        const rows = Object.values(byMarket);
+        const totals = rows.reduce((acc, r) => ({ bets: acc.bets+r.bets, stake: acc.stake+r.stake, payout: acc.payout+r.payout, pl: acc.pl+r.pl }), {bets:0,stake:0,payout:0,pl:0});
+
+        let html = `
+          <div class="stats-row" style="grid-template-columns:repeat(4,1fr);margin-bottom:15px;">
+            <div class="stat-card"><h4>Total Markets</h4><div class="val">${rows.length}</div></div>
+            <div class="stat-card"><h4>Total Bets</h4><div class="val">${totals.bets}</div></div>
+            <div class="stat-card"><h4>Total Stake</h4><div class="val">BDT ${totals.stake.toFixed(2)}</div></div>
+            <div class="stat-card"><h4>Net P/L</h4><div class="val" style="color:${totals.pl>=0?'#28a745':'#dc3545'};">BDT ${totals.pl.toFixed(2)}</div></div>
+          </div>`;
+
+        if (rows.length) {
+          html += `<table class="data-table"><thead><tr><th>Match / Market</th><th>Bets</th><th>Won</th><th>Lost</th><th>Stake</th><th>Payout</th><th>P/L</th></tr></thead><tbody>${rows.map(r=>`
+            <tr>
+              <td><b>${r.match}</b></td>
+              <td>${r.bets}</td>
+              <td style="color:#28a745;">${r.won}</td>
+              <td style="color:#dc3545;">${r.lost}</td>
+              <td>BDT ${r.stake.toFixed(2)}</td>
+              <td>BDT ${r.payout.toFixed(2)}</td>
+              <td style="color:${r.pl>=0?'#28a745':'#dc3545'};font-weight:bold;">BDT ${r.pl.toFixed(2)}</td>
+            </tr>`).join('')}</tbody></table>`;
+        } else {
+          html += '<div class="empty">No bets in this period</div>';
+        }
+        container.innerHTML = html;
+      }
+    }
+
+    init();
+  </script>
+</body>
+</html>
