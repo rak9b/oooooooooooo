@@ -15,6 +15,10 @@ require("./models/index"); // Load all models + associations
 const { errorHandler } = require("./middleware/errorHandler");
 
 const app = express();
+
+// Trust Netlify's proxy for express-rate-limit
+app.set('trust proxy', 1);
+
 const PORT = process.env.PORT || 3000;
 
 // ==================== SECURITY MIDDLEWARES ====================
