@@ -199,7 +199,10 @@ async function startServer() {
     }
 }
 
-startServer();
+if (!process.env.VERCEL) {
+    startServer();
+}
+
 
 process.on("unhandledRejection", (err) => {
     console.error("Unhandled Promise Rejection:", err);
