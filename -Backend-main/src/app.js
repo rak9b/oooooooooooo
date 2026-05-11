@@ -181,7 +181,8 @@ async function initialize() {
 }
 
 // Call initialization
-initialize();
+// initialize();
+
 
 if (require.main === module) {
     app.listen(PORT, () => {
