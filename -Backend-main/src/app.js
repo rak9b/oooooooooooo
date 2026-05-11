@@ -170,38 +170,25 @@ app.use(errorHandler);
 
 const permissionCache = require('./services/permissionCache');
 
-async function startServer() {
+async function initialize() {
     try {
         await sequelize.authenticate();
-        console.log("Database connected successfully (MySQL/MariaDB)");
-
-        // Sync database (development only)
-        if (process.env.NODE_ENV !== 'production') {
-            await sequelize.sync({ alter: true });
-            console.log("Database synced successfully");
-        }
-
-        // Initialize permission cache from DB
+        console.log("Database connected successfully");
         await permissionCache.init();
-
-        // Start server
-        app.listen(PORT, () => {
-            console.log(`Server running on port ${PORT}`);
-            console.log(`API: http://localhost:${PORT}/api/v1`);
-            console.log(`Health: http://localhost:${PORT}/health`);
-        });
     } catch (err) {
-        console.error("Startup Error:", err.message);
-        // Start server anyway with hardcoded fallback permissions
-        app.listen(PORT, () => {
-            console.log(`Server running on port ${PORT} (with fallback permissions)`);
-        });
+        console.error("Initialization Error:", err.message);
     }
 }
 
+// Call initialization
+initialize();
+
 if (require.main === module) {
-    startServer();
+    app.listen(PORT, () => {
+        console.log(`Server running on port ${PORT}`);
+    });
 }
+
 
 
 
