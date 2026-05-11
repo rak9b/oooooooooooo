@@ -59,8 +59,13 @@ const sequelize = new Sequelize(
         },
 
         dialectOptions: {
-            connectTimeout: 60000
+            connectTimeout: 60000,
+            ssl: {
+                require: true,
+                rejectUnauthorized: false
+            }
         },
+
 
         retry: {
             max: 3
