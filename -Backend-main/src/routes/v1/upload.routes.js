@@ -9,7 +9,14 @@ const { asyncHandler } = require("../../middleware/errorHandler");
 const { success, error } = require("../../utils/apiResponse");
 
 const UPLOADS_DIR = path.join(__dirname, "..", "..", "..", "public", "uploads");
-fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+if (require.main === module) {
+    try {
+        fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+    } catch (err) {
+        // Skip in serverless
+    }
+}
+
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => cb(null, UPLOADS_DIR),
