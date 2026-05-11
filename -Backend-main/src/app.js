@@ -82,27 +82,8 @@ if (process.env.NODE_ENV !== 'production') {
 
 // ==================== HEALTH CHECK ====================
 
-app.get('/health', async (req, res) => {
-    try {
-        await sequelize.authenticate();
-        res.json({
-            success: true,
-            message: 'Server is healthy',
-            data: {
-                server: 'running',
-                database: 'connected',
-                timestamp: new Date().toISOString(),
-                uptime: process.uptime()
-            }
-        });
-    } catch (err) {
-        res.status(500).json({
-            success: false,
-            message: 'Server unhealthy',
-            data: { server: 'running', database: 'disconnected' }
-        });
-    }
-});
+// Health check (moved to v1 path later, but keeping a fallback here)
+app.get('/health', (req, res) => res.json({ success: true, message: 'Server is up' }));
 
 // ==================== API ROUTES ====================
 
@@ -131,48 +112,44 @@ try {
 const { apiLandingPage } = require('./utils/apiLandingPage');
 
 app.get('/', (req, res) => {
-    // If request accepts HTML (browser), serve the login page
+    // For browser requests to root, serve login.html
     if (req.accepts('html')) {
         return res.sendFile(path.join(PUBLIC_DIR, 'login.html'));
     }
 
-    // Default to JSON for API clients
-    res.json({
-        success: true,
-        message: 'ExistingSky Backend API',
-        version: 'v1.0',
-        api: '/api/v1',
-        health: '/health',
-        endpoints: {
-            auth: '/api/v1/auth',
-            users: '/api/v1/users',
-            banking: '/api/v1/banking',
-            bets: '/api/v1/bets',
-            matches: '/api/v1/matches',
-            results: '/api/v1/results',
-            reports: '/api/v1/reports',
-            settings: '/api/v1/settings',
-            messages: '/api/v1/messages',
-            website: '/api/v1/website',
-            permissions: '/api/v1/permissions',
-            surveillance: '/api/v1/surveillance',
-            companyPayment: '/api/v1/company-payment'
-        }
-    });
+    // For API clients, redirect to v1 info
+    res.redirect('/api/v1');
 });
 
 app.get('/api/v1', (req, res) => {
+    if (req.accepts('html')) {
+        return res.send(apiLandingPage);
+    }
     res.json({
         success: true,
         message: 'ExistingSky API v1',
         version: '1.0.0',
-        totalEndpoints: '120+',
+        health: '/api/v1/health',
         modules: [
             'auth', 'users', 'banking', 'bets', 'matches',
             'results', 'reports', 'settings', 'messages',
             'website', 'permissions', 'surveillance', 'company-payment'
         ]
     });
+});
+
+app.get('/api/v1/health', async (req, res) => {
+    try {
+        await sequelize.authenticate();
+        res.json({
+            success: true,
+            status: 'UP',
+            database: 'CONNECTED',
+            timestamp: new Date()
+        });
+    } catch (e) {
+        res.status(503).json({ success: false, status: 'DOWN', error: e.message });
+    }
 });
 
 // ==================== ERROR HANDLING ====================
