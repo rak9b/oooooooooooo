@@ -53,7 +53,14 @@ app.use(cookieParser());
 // CORP override so uploaded images can be embedded by the frontend on a different origin
 // (e.g. dashboard served at 127.0.0.1:5500 while API runs at localhost:3000).
 const UPLOADS_DIR = path.join(__dirname, '..', 'public', 'uploads');
-fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+if (require.main === module) {
+    try {
+        fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+    } catch (err) {
+        console.warn("Uploads directory creation skipped:", err.message);
+    }
+}
+
 app.use('/uploads', (req, res, next) => {
     res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -181,7 +188,8 @@ async function initialize() {
 }
 
 // Call initialization
-// initialize();
+initialize();
+
 
 
 if (require.main === module) {
