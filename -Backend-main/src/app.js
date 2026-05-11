@@ -65,6 +65,10 @@ if (require.main === module) {
     }
 }
 
+// ==================== STATIC FILES ====================
+const PUBLIC_DIR = path.join(__dirname, '..', 'public');
+app.use(express.static(PUBLIC_DIR));
+
 app.use('/uploads', (req, res, next) => {
     res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -124,7 +128,15 @@ try {
 
 // ==================== API INFO ====================
 
+const { apiLandingPage } = require('./utils/apiLandingPage');
+
 app.get('/', (req, res) => {
+    // If request accepts HTML (browser), serve the login page
+    if (req.accepts('html')) {
+        return res.sendFile(path.join(PUBLIC_DIR, 'login.html'));
+    }
+
+    // Default to JSON for API clients
     res.json({
         success: true,
         message: 'ExistingSky Backend API',

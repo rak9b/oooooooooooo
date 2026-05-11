@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sky Info Tech - Management Panel</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; margin: 0; }
+        
+        /* ছবির মতো টপ গ্রিন বার */
+        .top-nav { background: #20c997; display: flex; overflow-x: auto; padding: 12px; gap: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .top-nav button { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.4); color: white; padding: 8px 16px; border-radius: 4px; cursor: pointer; white-space: nowrap; font-size: 13px; font-weight: 500; }
+        .top-nav button:hover { background: rgba(255,255,255,0.3); }
+
+        /* ক্যাটাগরি হেডার */
+        .section-header { background: #dee2e6; padding: 10px 20px; font-size: 13px; font-weight: bold; color: #495057; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 10px; border-left: 5px solid #20c997; }
+
+        /* গ্রিড লেআউট */
+        .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 12px; padding: 20px; }
+
+        /* বক্স ডিজাইন (আপনার ছবির মতো কালার বর্ডার সহ) */
+        .icon-box { background: white; border-radius: 8px; text-align: center; padding: 20px 10px; box-shadow: 0 3px 10px rgba(0,0,0,0.08); cursor: pointer; border-top: 5px solid #ccc; transition: 0.2s; }
+        .icon-box:hover { transform: translateY(-3px); box-shadow: 0 6px 15px rgba(0,0,0,0.12); }
+        .icon-box i { font-size: 28px; margin-bottom: 12px; display: block; }
+        .icon-box p { margin: 0; font-size: 11px; font-weight: 700; color: #333; text-transform: uppercase; line-height: 1.2; }
+
+        /* ছবির সাথে কালার ম্যাচিং */
+        .c-red { border-top-color: #e91e63; color: #e91e63; }
+        .c-green { border-top-color: #4caf50; color: #4caf50; }
+        .c-purple { border-top-color: #9c27b0; color: #9c27b0; }
+        .c-blue { border-top-color: #2196f3; color: #2196f3; }
+        .c-orange { border-top-color: #ff9800; color: #ff9800; }
+        .c-dark { border-top-color: #343a40; color: #343a40; }
+    </style>
+</head>
+<body>
+
+    <div class="top-nav">
+        <button><i class="fas fa-users"></i> Downline List</button>
+        <button><i class="fas fa-user-circle"></i> My Account</button>
+        <button><i class="fas fa-chart-line"></i> Bet ListLive</button>
+        <button><i class="fas fa-shield-alt"></i> Risk Management</button>
+        <button><i class="fas fa-university"></i> Banking</button>
+        <button><i class="fas fa-ban"></i> Block Market</button>
+    </div>
+
+    <div id="admin-section">
+        <div class="section-header">General Settings</div>
+        <div class="grid-container">
+            <div class="icon-box c-red"><i class="fas fa-key"></i><p>Change Password</p></div>
+            <div class="icon-box c-green"><i class="fas fa-coins"></i><p>Deposit Chips</p></div>
+            <div class="icon-box c-purple"><i class="fas fa-search"></i><p>Search Users</p></div>
+            <div class="icon-box c-blue"><i class="fas fa-globe"></i><p>Website Setting</p></div>
+            <div class="icon-box c-orange"><i class="fas fa-cogs"></i><p>Default Setting</p></div>
+            <div class="icon-box c-dark"><i class="fas fa-users-cog"></i><p>Concurrent Users</p></div>
+            <div class="icon-box c-green"><i class="fas fa-exchange-alt"></i><p>P2P Setting</p></div>
+        </div>
+
+        <div class="section-header">Match & Bets Control</div>
+        <div class="grid-container">
+            <div class="icon-box c-green"><i class="fas fa-play-circle"></i><p>Active Match</p></div>
+            <div class="icon-box c-red"><i class="fas fa-times-circle"></i><p>Rejected Bets</p></div>
+            <div class="icon-box c-orange"><i class="fas fa-bolt"></i><p>Fancy Control</p></div>
+            <div class="icon-box c-purple"><i class="fas fa-pause-circle"></i><p>Suspended Result</p></div>
+        </div>
+    </div>
+
+    <div class="section-header">User & Report Settings</div>
+    <div class="grid-container">
+        <div class="icon-box c-green"><i class="fas fa-user-check"></i><p>Active Users</p></div>
+        <div class="icon-box c-red"><i class="fas fa-user-slash"></i><p>Inactive Users</p></div>
+        <div class="icon-box c-blue"><i class="fas fa-file-invoice-dollar"></i><p>Profit Loss</p></div>
+        <div class="icon-box c-orange"><i class="fas fa-history"></i><p>Bet History</p></div>
+    </div>
+
+    <script>
+        // আপনার ব্যাকএন্ড থেকে আসা রোল চেক করা
+        const userRole = "OWNER"; // এখানে "MASTER_AGENT" দিলে নিচের লজিক কাজ করবে
+
+        function loadPanel() {
+            const adminSection = document.getElementById('admin-section');
+            if(userRole !== 'OWNER' && userRole !== 'ADMIN') {
+                // মাস্টার এজেন্ট হলে ওনার সেকশন মুছে যাবে
+                adminSection.style.display = 'none';
+            }
+        }
+        loadPanel();
+    </script>
+</body>
+</html>

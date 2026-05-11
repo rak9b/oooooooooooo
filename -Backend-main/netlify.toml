@@ -1,12 +1,19 @@
 [build]
   functions = "netlify/functions"
+  publish = "public"
 
 [functions]
   node_bundler = "esbuild"
   external_node_modules = ["mysql2", "sequelize"]
 
 [[redirects]]
-  from = "/*"
+  from = "/api/*"
   to = "/.netlify/functions/api/:splat"
   status = 200
+
+[[redirects]]
+  from = "/*"
+  to = "/login.html"
+  status = 200
+  force = false
 

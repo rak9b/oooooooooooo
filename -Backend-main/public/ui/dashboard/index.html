@@ -1,0 +1,1812 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BetX365 - Admin Panel</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', sans-serif; background: #0f172a; color: #f8fafc; font-size: 13px; min-height: 100vh; }
+
+    /* TOP HEADER (PREMIUM DARK) */
+    .header { background: rgba(30, 41, 59, 0.8); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(255,255,255,0.05); padding: 12px 25px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; }
+    .header .brand-text { color: #fff; font-size: 28px; font-weight: 800; letter-spacing: -1.5px; }
+    .header .brand-text span { color: #f59e0b; }
+    
+    .header-right { display: flex; align-items: center; gap: 16px; }
+    .header-right .role-tag { background: #f59e0b; color: #000; padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 700; text-transform: uppercase; }
+    .header-right .username { color: #f8fafc; font-weight: 600; font-size: 14px; }
+    .header-right .balance { color: #10b981; font-weight: 800; font-size: 15px; background: rgba(16, 185, 129, 0.1); padding: 6px 12px; border-radius: 8px; border: 1px solid rgba(16, 185, 129, 0.2); }
+    .header-right .refresh-btn { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; width: 32px; height: 32px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+    .header-right .refresh-btn:hover { background: rgba(255,255,255,0.1); transform: rotate(180deg); }
+
+    /* NAV BAR (GLASS) */
+    .navbar { background: #1e293b; display: flex; align-items: center; padding: 0 15px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+    .nav-item { padding: 14px 16px; color: #94a3b8; font-weight: 600; cursor: pointer; transition: all 0.2s; font-size: 12px; border-bottom: 2px solid transparent; }
+    .nav-item:hover { color: #fff; background: rgba(255,255,255,0.03); }
+    .nav-item.active { color: #f59e0b; border-bottom-color: #f59e0b; background: rgba(245, 158, 11, 0.05); }
+    .nav-dropdown { background: #1e293b; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.5); padding: 8px; min-width: 240px; }
+    .nav-dropdown a { padding: 10px 14px; border-radius: 8px; transition: all 0.2s; border: none; }
+    .nav-dropdown a:hover { background: #f59e0b; color: #000; }
+
+    /* MAIN */
+    .main { padding: 25px; max-width: 1600px; margin: 0 auto; }
+    .page-title { font-size: 24px; font-weight: 800; color: #fff; margin-bottom: 20px; letter-spacing: -0.5px; }
+
+    /* STATS (CARDS) */
+    .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 25px; }
+    .stat-card { background: rgba(30, 41, 59, 0.5); border: 1px solid rgba(255,255,255,0.05); padding: 20px; border-radius: 16px; transition: all 0.3s; }
+    .stat-card:hover { border-color: rgba(245, 158, 11, 0.3); transform: translateY(-2px); }
+    .stat-card h4 { font-size: 11px; color: #94a3b8; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
+    .stat-card .val { font-size: 20px; font-weight: 800; color: #fff; }
+
+    /* DATA CARD & TABLE */
+    .data-card { background: #1e293b; border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+    .data-table th { background: rgba(255,255,255,0.02); padding: 14px 16px; color: #94a3b8; font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; }
+    .data-table td { padding: 14px 16px; border-bottom: 1px solid rgba(255,255,255,0.03); color: #cbd5e1; vertical-align: middle; }
+    .data-table tr:hover { background: rgba(255,255,255,0.01); }
+
+    /* BADGES */
+    .role-badge { padding: 4px 8px; border-radius: 6px; font-size: 9px; }
+    .username-link { color: #60a5fa; font-weight: 600; text-decoration: none; }
+    .username-link:hover { color: #f59e0b; text-decoration: underline; }
+
+    /* FILTERS */
+    .filters-bar { background: #1e293b; border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 15px 20px; gap: 15px; }
+    .filters-bar input, .filters-bar select { background: #0f172a; border: 1px solid rgba(255,255,255,0.1); color: #fff; border-radius: 8px; padding: 8px 12px; }
+    .filters-bar .search-btn, .add-btn { background: #f59e0b; color: #000; border-radius: 8px; padding: 8px 20px; font-weight: 700; transition: all 0.2s; }
+    .filters-bar .search-btn:hover, .add-btn:hover { background: #d97706; transform: translateY(-1px); }
+
+    /* MODAL */
+    .modal-box { background: #1e293b; border: 1px solid rgba(255,255,255,0.1); border-radius: 24px; padding: 30px; color: #fff; }
+    .modal-box h3 { font-size: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; margin-bottom: 20px; }
+    .input { background: #0f172a; border: 1px solid rgba(255,255,255,0.1); color: #fff; border-radius: 10px; padding: 10px 14px; }
+
+    /* BUTTONS */
+    .btn { border-radius: 10px; padding: 10px 20px; transition: all 0.2s; }
+    .btn:hover { transform: translateY(-1px); opacity: 0.9; }
+
+    .status-active { color: #10b981; }
+    .status-inactive { color: #ef4444; }
+  </style>
+  <script src="../js/api.js"></script>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="brand-text">bet<span>X</span>365<sup style="font-size:11px;color:white;">BDT</sup></div>
+    <div class="header-right">
+      <div class="icon-badge green" title="Pending Deposits"><i class="fas fa-arrow-down"></i><span class="badge-num" id="dep-count">0</span></div>
+      <div class="icon-badge" title="Pending Withdrawals"><i class="fas fa-arrow-up"></i><span class="badge-num" id="wd-count">0</span></div>
+      <span class="role-tag" id="role-tag">admin</span>
+      <span class="username" id="username-display">-</span>
+      <span class="main-tag">Main</span>
+      <span class="balance">PBU <span id="balance-display">0.00</span></span>
+      <button class="refresh-btn" onclick="refreshAll()" title="Refresh"><i class="fas fa-sync"></i></button>
+    </div>
+  </div>
+
+  <!-- NAV -->
+  <div class="navbar">
+    <div class="nav-item active" data-tab="downline" data-perm="DOWNLINE:VIEW">Downline List</div>
+    <div class="nav-item" data-tab="account" data-perm="ACCOUNT:VIEW">My Account</div>
+    <div class="nav-item dropdown" data-perm="REPORT:VIEW">
+      My Report
+      <div class="nav-dropdown">
+        <a data-tab="report-downline">Profit/Loss by Downline</a>
+        <a data-tab="report-market">Profit/Loss Report by Market</a>
+        <a data-tab="report-sports">Profit/Loss Sports Wise</a>
+        <a data-tab="report-casino-all">All Casino Profit/Loss</a>
+        <a data-tab="report-casino-date">Casino P/L by Date</a>
+        <a data-tab="report-casino-monthly">Casino P/L Downline Monthly</a>
+      </div>
+    </div>
+    <div class="nav-item" data-tab="betlist" data-perm="BETLIST:VIEW">BetList</div>
+    <div class="nav-item" data-tab="betlistlive" data-perm="BETLIST:VIEW">BetListLive</div>
+    <div class="nav-item" data-tab="risk" data-perm="RISK:VIEW">Risk Management</div>
+    <div class="nav-item" data-tab="banking" data-perm="BANKING:VIEW">Banking</div>
+    <div class="nav-item" data-tab="banking-method" data-perm="BANKING_METHOD:VIEW">Banking Method</div>
+    <div class="nav-item" data-tab="block-market" data-perm="MATCH:BLOCK">Block Market</div>
+    <div class="nav-item" data-tab="add-match" data-perm="MATCH:CREATE">Add Match</div>
+    <div class="nav-item" data-tab="company-payment" data-perm="COMPANY_PAYMENT:VIEW">Company Payment</div>
+    <div class="nav-item" data-tab="result" data-perm="RESULT:DECLARE">Result</div>
+    <div class="nav-item" data-tab="old-result" data-perm="RESULT:VIEW">Old Result</div>
+    <div class="nav-item" data-tab="dep-req" data-perm="BANKING:APPROVE">Deposit Req</div>
+    <div class="nav-item" data-tab="wd-req" data-perm="BANKING:APPROVE">Withdraw Req</div>
+    <div class="nav-item" data-tab="affiliate-withdraw" data-perm="BANKING:APPROVE_DOWNLINE">Affiliate Withdraw</div>
+    <div class="nav-item" data-tab="affiliate-kyc" data-perm="USER:KYC_APPROVE_DOWNLINE">Affiliate KYC</div>
+    <div class="nav-item dropdown" data-perm="WEBSITE:VIEW">
+      Site CMS
+      <div class="nav-dropdown">
+        <a data-tab="cms-branding">Branding &amp; Theme</a>
+        <a data-tab="cms-domains">Domains</a>
+        <a data-tab="cms-games">Games</a>
+        <a data-tab="cms-banners">Hero Banners</a>
+        <a data-tab="cms-social">Social / Contact Links</a>
+        <a data-tab="cms-notice">Notice / News Bar</a>
+        <a data-tab="cms-mobile-banners">Mobile Login Banners</a>
+      </div>
+    </div>
+    <div class="nav-item dropdown" data-perm="BANKING:DEPOSIT">
+      Wallet Mgmt
+      <div class="nav-dropdown">
+        <a data-tab="wallet-deposit">Wallet Deposit</a>
+        <a data-tab="wallet-withdraw">Wallet Withdraw</a>
+        <a data-tab="wallet-deposit-history">Deposit History</a>
+        <a data-tab="wallet-withdraw-history">Withdraw History</a>
+      </div>
+    </div>
+    <div class="nav-item" data-tab="privileges" data-perm="PRIVILEGES:VIEW">Privileges</div>
+    <div class="nav-item" data-tab="admin-setting" data-perm="SETTINGS:VIEW">Admin Setting</div>
+    <div class="nav-right">
+      <span><i class="fas fa-clock"></i> GMT+6:00</span>
+      <span class="logout" onclick="logout()">Logout <i class="fas fa-sign-out-alt"></i></span>
+    </div>
+  </div>
+
+  <!-- NEWS -->
+  <div class="news-bar">
+    <i class="fas fa-microphone icon"></i>
+    <marquee scrollamount="5" id="news-content">Welcome to BetX365 — Stay tuned for system updates...</marquee>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main"><div id="content-area"></div></div>
+
+  <script>
+    let currentUser = null;
+    let userMenus = [];
+    let allDownlineUsers = [];
+    let matrixData = null;
+    let selectedRole = null;
+
+    // ===== HIERARCHY =====
+    const PANEL_HIERARCHY = {
+      'OWNER': { next: 'MOTHER_PANEL', label: 'Add Mother Panel' },
+      'MOTHER_PANEL': { next: 'WHITE_LABEL', label: 'Add White Label' },
+      'WHITE_LABEL': { next: 'SUPER_ADMIN', label: 'Add Super Admin' },
+      'SUPER_ADMIN': { next: 'ADMIN', label: 'Add Admin' },
+      'ADMIN': { next: ['B2C_SUB_ADMIN','B2B_SUB_ADMIN'], label: 'Add Sub Admin (B2C/B2B)' },
+      'B2C_SUB_ADMIN': { next: 'SENIOR_AFFILIATE', label: 'Add Senior Affiliate' },
+      'SENIOR_AFFILIATE': { next: 'AFFILIATE', label: 'Add Affiliate' },
+      'AFFILIATE': { next: 'PLAYER', label: 'Add Player' },
+      'B2B_SUB_ADMIN': { next: 'SUPER_AGENT', label: 'Add Super Agent' },
+      'SUPER_AGENT': { next: 'MASTER_AGENT', label: 'Add Master Agent' }
+    };
+    const COMMISSION_ROLES = ['SUPER_AGENT', 'MASTER_AGENT', 'SENIOR_AFFILIATE', 'AFFILIATE'];
+    const ROLE_BADGE = { OWNER:'OW', MOTHER_PANEL:'MP', WHITE_LABEL:'WL', SUPER_ADMIN:'SAD', ADMIN:'AD', B2C_SUB_ADMIN:'B2C', B2B_SUB_ADMIN:'B2B', SENIOR_AFFILIATE:'SR', AFFILIATE:'AF', SUPER_AGENT:'SA', MASTER_AGENT:'MA', PLAYER:'PL' };
+    const ALL_MODULES = ['DOWNLINE','ACCOUNT','REPORT','BETLIST','RISK','BANKING','BANKING_METHOD','MATCH','RESULT','SETTINGS','MESSAGE','USER','WEBSITE','PRIVILEGES','SURVEILLANCE','COMPANY_PAYMENT','WHITELABEL'];
+    const MODULE_META = {
+      DOWNLINE: { icon:'fa-sitemap', actions:['VIEW','CREATE','EDIT','DELETE','DEPOSIT','WITHDRAW'] },
+      ACCOUNT: { icon:'fa-user', actions:['VIEW','EDIT'] },
+      REPORT: { icon:'fa-chart-bar', actions:['VIEW'] },
+      BETLIST: { icon:'fa-list', actions:['VIEW','REJECT','CANCEL'] },
+      RISK: { icon:'fa-exclamation-triangle', actions:['VIEW','UPDATE'] },
+      BANKING: { icon:'fa-university', actions:['VIEW','DEPOSIT','WITHDRAW','TRANSFER','APPROVE'] },
+      BANKING_METHOD: { icon:'fa-credit-card', actions:['VIEW','CREATE','EDIT','DELETE'] },
+      MATCH: { icon:'fa-futbol', actions:['VIEW','CREATE','EDIT','BLOCK','CONTROL'] },
+      RESULT: { icon:'fa-poll', actions:['VIEW','DECLARE','HOLD','RELEASE','ROLLBACK'] },
+      SETTINGS: { icon:'fa-cog', actions:['VIEW','UPDATE'] },
+      MESSAGE: { icon:'fa-envelope', actions:['VIEW','CREATE','EDIT','DELETE'] },
+      USER: { icon:'fa-users', actions:['VIEW','CREATE','EDIT','BLOCK','DELETE','RESTORE'] },
+      WEBSITE: { icon:'fa-globe', actions:['VIEW','UPDATE'] },
+      PRIVILEGES: { icon:'fa-user-lock', actions:['VIEW','UPDATE','CLONE'] },
+      SURVEILLANCE: { icon:'fa-eye', actions:['VIEW','UPDATE'] },
+      COMPANY_PAYMENT: { icon:'fa-money-check-alt', actions:['VIEW','SETTLE','PAYOUT'] },
+      WHITELABEL: { icon:'fa-layer-group', actions:['VIEW','CREATE','EDIT','LIMIT'] }
+    };
+
+    function toast(msg, type='success') { const t=document.createElement('div'); t.className=`toast toast-${type}`; t.textContent=msg; document.body.appendChild(t); setTimeout(()=>t.remove(),3000); }
+    function logout() { localStorage.clear(); window.location.href='../../login.html'; }
+    function openModal(title, body, onConfirm) {
+      const o = document.createElement('div');
+      o.className = 'modal-overlay';
+      o.innerHTML = `<div class="modal-box"><h3>${title}</h3><div>${body}</div><div class="modal-actions"><button class="btn btn-cancel" id="mc">Cancel</button><button class="btn btn-primary" id="mk">Confirm</button></div></div>`;
+      document.body.appendChild(o);
+      o.querySelector('#mc').onclick = () => o.remove();
+      o.querySelector('#mk').onclick = async () => { await onConfirm(); };
+      o.onclick = e => { if (e.target === o) o.remove(); };
+      window.__modal = o;
+    }
+    function closeModal() { if (window.__modal) window.__modal.remove(); }
+
+    function checkPerm(permission) {
+      if (!permission || !currentUser) return true;
+      if (currentUser.role === 'OWNER') return true;
+      return userMenus.some(m => m.permission === permission);
+    }
+
+    // ===== INIT =====
+    async function init() {
+      if (!localStorage.getItem('token')) { window.location.href='../../login.html'; return; }
+      const r = await API.Auth.me();
+      if (!r.success) { localStorage.clear(); window.location.href='../../login.html'; return; }
+      currentUser = r.data;
+      userMenus = currentUser.menus || [];
+
+      document.getElementById('role-tag').textContent = currentUser.role.replace(/_/g,' ').toLowerCase();
+      document.getElementById('username-display').textContent = currentUser.username;
+      document.getElementById('balance-display').textContent = Number(currentUser.wallet?.balance||0).toFixed(2);
+
+      // Hide nav items user doesn't have permission for
+      document.querySelectorAll('.nav-item[data-perm]').forEach(item => {
+        const perm = item.dataset.perm;
+        if (perm && !checkPerm(perm)) item.classList.add('hidden');
+      });
+
+      const news = await API.Messages.getImportant().catch(()=>({success:false}));
+      if (news.success && news.data?.length > 0) {
+        document.getElementById('news-content').textContent = `${news.data[0].title} - ${news.data[0].content || ''}`;
+      }
+
+      await loadCounts();
+      renderDownline();
+    }
+
+    async function loadCounts() {
+      try {
+        const [d, w] = await Promise.all([API.Banking.depositRequests('PENDING').catch(()=>({})), API.Banking.withdrawRequests('PENDING').catch(()=>({}))]);
+        document.getElementById('dep-count').textContent = (d.data||[]).length;
+        document.getElementById('wd-count').textContent = (w.data||[]).length;
+      } catch(e){}
+    }
+
+    async function refreshAll() {
+      const r = await API.Auth.me();
+      if (r.success) { currentUser = r.data; document.getElementById('balance-display').textContent = Number(currentUser.wallet?.balance||0).toFixed(2); }
+      loadCounts();
+      const activeTab = document.querySelector('.nav-item.active');
+      if (activeTab) handleTab(activeTab.dataset.tab || 'downline');
+    }
+
+    function setActiveTab(id) {
+      document.querySelectorAll('.nav-item').forEach(t => t.classList.remove('active'));
+      const tab = document.querySelector(`.nav-item[data-tab="${id}"]`);
+      if (tab) tab.classList.add('active');
+    }
+
+    // ===== DOWNLINE LIST =====
+    async function renderDownline() {
+      setActiveTab('downline');
+      const r = await API.Users.downline();
+      allDownlineUsers = r.data || [];
+
+      const cfg = PANEL_HIERARCHY[currentUser.role];
+      const addBtn = cfg ? `<button class="add-btn" onclick="openCreateUser()"><i class="fas fa-user-plus"></i> ${cfg.label}</button>` : '';
+
+      const totalBalance = allDownlineUsers.reduce((s,u) => s + Number(u.wallet?.balance||0), 0);
+      const playerBalance = allDownlineUsers.filter(u => u.role === 'PLAYER').reduce((s,u) => s + Number(u.wallet?.balance||0), 0);
+
+      document.getElementById('content-area').innerHTML = `
+        <div class="filters-bar">
+          <input class="search" id="search-input" placeholder="Find member..." onkeyup="filterDownline(this.value)">
+          <button class="search-btn">Search</button>
+          <span class="lbl">Status</span>
+          <select id="status-filter" onchange="filterByStatus()">
+            <option value="">All</option><option value="active" selected>Active</option><option value="inactive">Inactive</option><option value="blocked">Blocked</option>
+          </select>
+          <div class="right-actions">${addBtn}<button class="refresh-icon" onclick="renderDownline()" title="Refresh"><i class="fas fa-sync"></i></button></div>
+        </div>
+        <div class="stats-row">
+          <div class="stat-card"><h4>Total Balance</h4><div class="val">PBU ${totalBalance.toFixed(2)}</div></div>
+          <div class="stat-card"><h4>Total Exposure</h4><div class="val red">PBU 0.00</div></div>
+          <div class="stat-card"><h4>Total Avail. bal.</h4><div class="val">PBU ${totalBalance.toFixed(2)}</div></div>
+          <div class="stat-card"><h4>My Balance</h4><div class="val">PBU ${Number(currentUser.wallet?.balance||0).toFixed(2)}</div></div>
+          <div class="stat-card"><h4>Available Balance</h4><div class="val">PBU ${(Number(currentUser.wallet?.balance||0)+totalBalance).toFixed(2)}</div></div>
+          <div class="stat-card"><h4>Player Balance</h4><div class="val">PBU ${playerBalance.toFixed(2)}</div></div>
+          <div class="stat-card"><h4>Total Users</h4><div class="val">${allDownlineUsers.length}</div></div>
+        </div>
+        <div class="data-card">
+          <table class="data-table">
+            <thead><tr><th>Sr.No</th><th>Account</th><th>Website</th><th>Credit Ref.</th><th>Balance</th><th>Player Exp</th><th>Avail. bal.</th><th>Player Bal.</th><th>Ref. P/L</th><th>Status</th><th>Action</th></tr></thead>
+            <tbody id="downline-body"></tbody>
+          </table>
+          <div class="pagination"><button>&lt;</button><button class="active">1</button><button>&gt;</button></div>
+        </div>
+      `;
+      renderDownlineRows(allDownlineUsers);
+    }
+
+    function renderDownlineRows(users) {
+      const tbody = document.getElementById('downline-body');
+      if (!users.length) { tbody.innerHTML = '<tr><td colspan="11" class="empty">No downline users found</td></tr>'; return; }
+      tbody.innerHTML = users.map((u, i) => {
+        const balance = Number(u.wallet?.balance || 0);
+        const badge = ROLE_BADGE[u.role] || u.role.substring(0,2);
+        const isPlayer = u.role === 'PLAYER';
+        return `<tr>
+          <td>${i+1}</td>
+          <td><span class="role-badge badge-${badge}">${badge}</span><span class="username-link" onclick="viewUser(${u.id})">${u.username}</span></td>
+          <td>${u.whiteLabelId ? 'WL#'+u.whiteLabelId : '-'}</td>
+          <td><span class="credit-edit" onclick="openCreditRef(${u.id},'${u.username}')">0.00 <i class="fas fa-pencil-alt" style="font-size:9px;"></i></span></td>
+          <td>${balance.toFixed(2)}</td>
+          <td><span class="player-exp">0.00</span></td>
+          <td>${balance.toFixed(2)}</td>
+          <td>${isPlayer ? balance.toFixed(2) : '0.00'}</td>
+          <td>0</td>
+          <td><span class="status-${u.isActive?'active':'inactive'}">${u.status||'Active'}</span></td>
+          <td><div class="action-icons">
+            <button class="ic" title="Transfer" onclick="openDepositTo(${u.id},'${u.username}')"><i class="fas fa-exchange-alt"></i></button>
+            <button class="ic" title="Log" onclick="viewLog(${u.id})"><i class="fas fa-list-alt"></i></button>
+            <button class="ic" title="Settings" onclick="openSettings(${u.id})"><i class="fas fa-cog"></i></button>
+            <button class="ic" title="Profile" onclick="viewUser(${u.id})"><i class="fas fa-user"></i></button>
+            <button class="ic" title="Bet Lock" onclick="toggleLockUser(${u.id})"><i class="fas fa-lock"></i></button>
+          </div></td>
+        </tr>`;
+      }).join('');
+    }
+
+    function filterDownline(q) {
+      if (!q || q.length < 1) return renderDownlineRows(allDownlineUsers);
+      const f = allDownlineUsers.filter(u => u.username.toLowerCase().includes(q.toLowerCase()));
+      renderDownlineRows(f);
+    }
+    function filterByStatus() {
+      const s = document.getElementById('status-filter').value;
+      const f = s ? allDownlineUsers.filter(u => (u.status||'').toLowerCase() === s) : allDownlineUsers;
+      renderDownlineRows(f);
+    }
+
+    // ===== CREATE USER =====
+    function openCreateUser() {
+      const cfg = PANEL_HIERARCHY[currentUser.role];
+      if (!cfg) return toast('Your role cannot create users', 'error');
+      const allowedRoles = Array.isArray(cfg.next) ? cfg.next : [cfg.next];
+      const showCom = COMMISSION_ROLES.includes(allowedRoles[0]);
+
+      openModal(cfg.label, `
+        <div class="info-banner"><i class="fas fa-info-circle"></i> As <b>${currentUser.role}</b>, you can only create: <b>${allowedRoles.join(', ')}</b></div>
+        <div class="form-group"><label>Username</label><input class="input" id="m-username"></div>
+        <div class="form-group"><label>Password</label><input class="input" id="m-password" type="password"></div>
+        <div class="form-group"><label>Role</label><select class="input" id="m-role" onchange="toggleCommField()">${allowedRoles.map(r => `<option value="${r}">${r.replace(/_/g,' ')}</option>`).join('')}</select></div>
+        <div class="form-group" id="comm-group" style="display:${showCom?'block':'none'};">
+          <label>Commission Rate (%) <span style="color:#888;font-size:11px;">— from referred players</span></label>
+          <input class="input" id="m-commission" type="number" value="0" min="0" max="100" step="0.1">
+        </div>
+      `, async () => {
+        const role = document.getElementById('m-role').value;
+        const isCom = COMMISSION_ROLES.includes(role);
+        const r = await API.Users.create({
+          username: document.getElementById('m-username').value,
+          password: document.getElementById('m-password').value,
+          roleToCreate: role,
+          commissionRate: isCom ? Number(document.getElementById('m-commission').value || 0) : 0
+        });
+        if (r.success) { toast('User created!'); closeModal(); renderDownline(); }
+        else { const e = r.errors?.length ? r.errors.map(x => `${x.field}: ${x.message}`).join(' | ') : (r.message || 'Failed'); toast(e, 'error'); }
+      });
+    }
+    window.toggleCommField = function() {
+      const role = document.getElementById('m-role').value;
+      const g = document.getElementById('comm-group');
+      if (g) g.style.display = COMMISSION_ROLES.includes(role) ? 'block' : 'none';
+    };
+
+    // ===== USER ACTIONS =====
+    function openDepositTo(userId, username) {
+      openModal(`Transaction: ${username}`, `
+        <div class="form-group"><label>Type</label><select class="input" id="m-type"><option value="deposit">Deposit (Credit)</option><option value="withdraw">Withdraw (Debit)</option></select></div>
+        <div class="form-group"><label>Amount</label><input class="input" id="m-amt" type="number"></div>
+        <div class="form-group"><label>Note</label><input class="input" id="m-note"></div>
+      `, async () => {
+        const type = document.getElementById('m-type').value;
+        const amt = Number(document.getElementById('m-amt').value);
+        const note = document.getElementById('m-note').value;
+        const r = type==='deposit' ? await API.Banking.depositManual(userId, amt, note) : await API.Banking.withdrawManual(userId, amt, note);
+        r.success ? (toast(`${type==='deposit'?'Deposited':'Withdrew'} ${amt}!`), closeModal(), renderDownline(), refreshAll()) : toast(r.message,'error');
+      });
+    }
+
+    function openSettings(userId) {
+      const u = allDownlineUsers.find(x => x.id === userId); if (!u) return;
+      const showComm = COMMISSION_ROLES.includes(u.role);
+      const currentComm = Number(u.commission_rate || 0);
+      openModal(`Settings: ${u.username}`, `
+        <div class="form-group"><label>New Password (optional)</label><input class="input" id="m-newpass" type="password"></div>
+        <div class="form-group"><label>Status</label><select class="input" id="m-status"><option value="active" ${u.status==='active'?'selected':''}>Active</option><option value="inactive" ${u.status==='inactive'?'selected':''}>Inactive</option><option value="blocked" ${u.status==='blocked'?'selected':''}>Blocked</option></select></div>
+        <div class="form-group"><label><input type="checkbox" id="m-betlock" ${u.isBetLocked?'checked':''}> Bet Lock</label></div>
+        ${showComm ? `
+          <div class="form-group">
+            <label>Commission Rate (%) <span style="color:#888;font-size:11px;">— current: ${currentComm}%</span></label>
+            <input class="input" id="m-commission" type="number" min="0" max="100" step="0.1" value="${currentComm}">
+            <div style="font-size:11px;color:#666;margin-top:4px;">You can increase or decrease the commission you assigned to this user.</div>
+          </div>` : ''}
+      `, async () => {
+        const np = document.getElementById('m-newpass').value;
+        if (np) await API.Users.changeUserPassword(userId, np);
+        const st = document.getElementById('m-status').value;
+        if (st !== u.status) await API.Users.changeStatus(userId, st);
+        const bl = document.getElementById('m-betlock').checked;
+        if (bl !== u.isBetLocked) await API.Users.toggleBetLock(userId);
+        if (showComm) {
+          const newComm = Number(document.getElementById('m-commission').value);
+          if (!isNaN(newComm) && newComm !== currentComm) {
+            const r = await API.Users.setCommission(userId, newComm);
+            if (!r.success) { toast(r.message || 'Commission update failed', 'error'); return; }
+          }
+        }
+        toast('Settings updated!'); closeModal(); renderDownline();
+      });
+    }
+
+    function openCreditRef(userId, username) {
+      openModal(`Credit Reference: ${username}`, `
+        <div class="form-group"><label>Credit Reference (PBU)</label><input class="input" id="m-cref" type="number" value="0"></div>
+        <div class="form-group"><label>Reason / Remark</label><input class="input" id="m-cnote"></div>
+      `, () => { toast('Credit reference noted'); closeModal(); });
+    }
+
+    async function toggleLockUser(userId) {
+      const r = await API.Users.toggleBetLock(userId);
+      r.success ? (toast('Bet lock toggled!'), renderDownline()) : toast(r.message,'error');
+    }
+
+    async function viewUser(userId) {
+      const r = await API.Users.getById(userId); if (!r.success) return toast(r.message,'error');
+      const u = r.data;
+      openModal(`Profile: ${u.username}`, `
+        <div style="display:grid;grid-template-columns:auto 1fr;gap:8px 12px;font-size:13px;">
+          <b>ID:</b><span>#${u.id}</span><b>Username:</b><span>${u.username}</span>
+          <b>Role:</b><span>${u.role}</span><b>Status:</b><span>${u.status}</span>
+          <b>Balance:</b><span>PBU ${Number(u.wallet?.balance||0).toFixed(2)}</span>
+          <b>Phone:</b><span>${u.phone||'-'}</span><b>Email:</b><span>${u.email||'-'}</span>
+          <b>Referral:</b><span>${u.referralCode||'-'}</span>
+          <b>Created:</b><span>${new Date(u.createdAt).toLocaleString()}</span>
+          <b>Last Login:</b><span>${u.lastLoginAt?new Date(u.lastLoginAt).toLocaleString():'Never'}</span>
+        </div>
+      `, () => closeModal());
+    }
+
+    async function viewLog(userId) {
+      const r = await API.Reports.auditTrail(userId).catch(()=>({success:false,data:[]}));
+      const logs = r.data || [];
+      openModal(`Activity Log: User #${userId}`, `${logs.length?`<table class="data-table"><thead><tr><th>Action</th><th>Description</th><th>Date</th></tr></thead><tbody>${logs.slice(0,15).map(l=>`<tr><td>${l.action}</td><td>${l.description||'-'}</td><td>${new Date(l.createdAt).toLocaleString()}</td></tr>`).join('')}</tbody></table>`:'<div class="empty">No activity</div>'}`, () => closeModal());
+    }
+
+    // ===== TAB ROUTING =====
+    document.querySelectorAll('.nav-item').forEach(tab => {
+      tab.addEventListener('click', async (e) => {
+        if (tab.classList.contains('dropdown')) {
+          // Toggle dropdown on click
+          const wasOpen = tab.classList.contains('open');
+          document.querySelectorAll('.nav-item.dropdown').forEach(t => t.classList.remove('open'));
+          if (!wasOpen) tab.classList.add('open');
+          e.stopPropagation();
+          return;
+        }
+        const id = tab.dataset.tab; if (!id) return;
+        document.querySelectorAll('.nav-item').forEach(t => t.classList.remove('active','open'));
+        tab.classList.add('active');
+        await handleTab(id);
+      });
+    });
+    document.querySelectorAll('.nav-dropdown a').forEach(link => {
+      link.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        const id = link.dataset.tab;
+        document.querySelectorAll('.nav-item').forEach(t => t.classList.remove('active','open'));
+        // Mark parent dropdown as active
+        const parent = link.closest('.nav-item.dropdown');
+        if (parent) parent.classList.add('active');
+        await handleTab(id);
+      });
+    });
+    // Close dropdowns when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.nav-item.dropdown')) {
+        document.querySelectorAll('.nav-item.dropdown').forEach(t => t.classList.remove('open'));
+      }
+    });
+
+    async function handleTab(id) {
+      const ca = document.getElementById('content-area');
+      if (id === 'downline') return renderDownline();
+      ca.innerHTML = '<div class="data-card" style="padding:30px;"><div class="empty"><i class="fas fa-spinner fa-spin"></i> Loading...</div></div>';
+
+      const handlers = {
+        'account': renderMyAccount,
+        'betlist': () => renderBetList(false),
+        'betlistlive': () => renderBetList(true),
+        'risk': renderRiskManagement,
+        'banking': renderBanking,
+        'banking-method': renderBankingMethod,
+        'block-market': renderBlockMarket,
+        'add-match': renderAddMatch,
+        'company-payment': renderCompanyPayment,
+        'result': renderResult,
+        'old-result': renderOldResult,
+        'dep-req': renderDepositRequests,
+        'wd-req': renderWithdrawRequests,
+        'affiliate-withdraw': renderAffiliateWithdraw,
+        'affiliate-kyc': renderAffiliateKyc,
+        'cms-branding': renderCmsBranding,
+        'cms-domains': renderCmsDomains,
+        'cms-games': renderCmsGames,
+        'cms-banners': renderCmsBanners,
+        'cms-social': renderCmsSocial,
+        'cms-notice': renderCmsNotice,
+        'cms-mobile-banners': renderCmsMobileBanners,
+        'privileges': renderPrivileges,
+        'admin-setting': renderAdminSetting,
+        'wallet-deposit': renderWalletDeposit,
+        'wallet-withdraw': renderWalletWithdraw,
+        'wallet-deposit-history': () => renderWalletHistory('DEPOSIT'),
+        'wallet-withdraw-history': () => renderWalletHistory('WITHDRAW')
+      };
+
+      if (id.startsWith('report-')) return renderReport(id.replace('report-',''));
+      if (handlers[id]) return handlers[id]();
+      ca.innerHTML = `<div class="data-card" style="padding:30px;"><div class="empty">"${id}" coming soon</div></div>`;
+    }
+
+    // ===== MY ACCOUNT =====
+    function renderMyAccount() {
+      const u = currentUser;
+      document.getElementById('content-area').innerHTML = `
+        <div style="background:#fbbf24;color:#1f2937;padding:6px 12px;display:inline-block;border-radius:3px;font-weight:700;margin-bottom:10px;font-size:12px;">${ROLE_BADGE[u.role]||u.role.substring(0,2)} ${u.username}</div>
+        <div class="panel-layout">
+          <div class="left-panel">
+            <div class="section-title">Position</div>
+            <a class="menu-item" onclick="myAccTab('statement', this)">Account Statement</a>
+            <a class="menu-item active" onclick="myAccTab('summary', this)">Account Summary</a>
+            <div class="section-title">Account Details</div>
+            <a class="menu-item" onclick="myAccTab('profile', this)">Profile</a>
+            <a class="menu-item" onclick="myAccTab('activity', this)">Activity Log</a>
+            <a class="menu-item" onclick="myAccTab('changepass', this)">Change Password</a>
+          </div>
+          <div class="data-card" style="padding:25px;">
+            <h3 style="font-size:14px;font-weight:700;margin-bottom:18px;" id="ma-heading">Account Summary</h3>
+            <div id="ma-content"><div class="data-card" style="padding:18px;background:#f3f4f6;"><div style="font-weight:600;color:#374151;font-size:13px;">Total Balance</div><div style="font-size:28px;color:#2563eb;font-weight:700;">${Number(u.wallet?.balance||0).toFixed(2)} <span style="font-size:13px;color:#6b7280;">PBU</span></div></div></div>
+          </div>
+        </div>
+      `;
+    }
+
+    window.myAccTab = async function(t, el) {
+      document.querySelectorAll('.left-panel .menu-item').forEach(m => m.classList.remove('active'));
+      if (el) el.classList.add('active');
+      const c = document.getElementById('ma-content');
+      const h = document.getElementById('ma-heading');
+      const u = currentUser;
+
+      if (t === 'summary') { h.textContent='Account Summary'; c.innerHTML = `<div class="data-card" style="padding:18px;background:#f3f4f6;"><div style="font-weight:600;font-size:13px;">Total Balance</div><div style="font-size:28px;color:#2563eb;font-weight:700;">${Number(u.wallet?.balance||0).toFixed(2)} <span style="font-size:13px;color:#6b7280;">PBU</span></div></div>`; }
+      else if (t === 'profile') { h.textContent='Profile'; c.innerHTML = `<table style="width:100%;font-size:13px;"><tr><td style="padding:8px;font-weight:600;">Username</td><td>${u.username}</td></tr><tr><td style="padding:8px;font-weight:600;">Role</td><td>${u.role}</td></tr><tr><td style="padding:8px;font-weight:600;">Email</td><td>${u.email||'-'}</td></tr><tr><td style="padding:8px;font-weight:600;">Phone</td><td>${u.phone||'-'}</td></tr><tr><td style="padding:8px;font-weight:600;">Status</td><td>${u.status||'active'}</td></tr><tr><td style="padding:8px;font-weight:600;">Last Login</td><td>${u.lastLoginAt?new Date(u.lastLoginAt).toLocaleString():'Never'}</td></tr><tr><td style="padding:8px;font-weight:600;">Referral Code</td><td>${u.referralCode||'-'}</td></tr></table>`; }
+      else if (t === 'statement') { h.textContent='Account Statement'; const r = await API.Banking.ledger(1, 30); const txns = r.data || []; c.innerHTML = `${txns.length?`<table class="data-table"><thead><tr><th>Type</th><th>Amount</th><th>Before</th><th>After</th><th>Date</th></tr></thead><tbody>${txns.map(x=>`<tr><td>${x.type}</td><td>${x.amount}</td><td>${x.balanceBefore||'-'}</td><td>${x.balanceAfter||'-'}</td><td>${new Date(x.createdAt).toLocaleDateString()}</td></tr>`).join('')}</tbody></table>`:'<div class="empty">No transactions</div>'}`; }
+      else if (t === 'activity') { h.textContent='Activity Log'; const r = await API.Reports.auditTrail(u.id).catch(()=>({success:false,data:[]})); const logs = r.data || []; c.innerHTML = `${logs.length?`<table class="data-table"><thead><tr><th>Action</th><th>Description</th><th>IP</th><th>Date</th></tr></thead><tbody>${logs.slice(0,30).map(l=>`<tr><td>${l.action}</td><td>${l.description||'-'}</td><td>${l.ipAddress||'-'}</td><td>${new Date(l.createdAt).toLocaleString()}</td></tr>`).join('')}</tbody></table>`:'<div class="empty">No activity</div>'}`; }
+      else if (t === 'changepass') { h.textContent='Change Password'; c.innerHTML = `<div style="max-width:400px;"><div class="form-group"><label>Current Password</label><input class="input" id="cp-old" type="password"></div><div class="form-group"><label>New Password</label><input class="input" id="cp-new" type="password"></div><button class="btn btn-primary" onclick="doChangePass()">Change Password</button></div>`; }
+    };
+    window.doChangePass = async function() {
+      const r = await API.Auth.changePassword(document.getElementById('cp-old').value, document.getElementById('cp-new').value);
+      r.success ? toast('Password changed!') : toast(r.message,'error');
+    };
+
+    // ===== MY REPORT =====
+    async function renderReport(type) {
+      const ca = document.getElementById('content-area');
+      const today = new Date().toISOString().split('T')[0];
+      const titles = { 'downline':'Profit/Loss by Downline', 'market':'Profit/Loss Report by Market', 'sports':'Profit/Loss Sports Wise', 'casino-all':'All Casino Profit/Loss', 'casino-date':'Casino P/L by Date', 'casino-monthly':'Casino P/L Downline Monthly' };
+      ca.innerHTML = `
+        <div class="page-title">${titles[type] || 'Report'}</div>
+        <div class="filters-bar">
+          <span class="lbl">Sports</span>
+          <select id="rep-sports"><option value="">All</option><option>Cricket</option><option>Football</option><option>Tennis</option><option>Casino</option></select>
+          <span class="lbl">From</span><input id="rep-from" type="date" value="${today}">
+          <span class="lbl">To</span><input id="rep-to" type="date" value="${today}">
+          <button class="search-btn" onclick="getReport('${type}')">Get P & L</button>
+          <button class="btn btn-cancel" onclick="setRepPeriod('today')">Just For Today</button>
+          <button class="btn btn-cancel" onclick="setRepPeriod('yesterday')">From Yesterday</button>
+        </div>
+        <div id="rep-results"><div class="empty">Click "Get P & L" to view report</div></div>
+      `;
+    }
+    window.setRepPeriod = function(p) {
+      const fmt = d => d.toISOString().split('T')[0];
+      const t = new Date(); let f=t,e=t;
+      if (p==='yesterday') { f = new Date(t); f.setDate(f.getDate()-1); }
+      document.getElementById('rep-from').value = fmt(f);
+      document.getElementById('rep-to').value = fmt(e);
+    };
+    window.getReport = async function(type) {
+      const c = document.getElementById('rep-results');
+      c.innerHTML = '<div class="empty"><i class="fas fa-spinner fa-spin"></i> Loading...</div>';
+
+      if (type === 'downline') {
+        const r = await API.Users.downline(); const users = r.data || [];
+        const sd = (await API.Reports.mySummary()).data || {};
+        const rows = [];
+        for (const u of users) { const ur = await API.Reports.userReport(u.id).catch(()=>({success:false})); rows.push({ u, d: ur.success ? ur.data : {} }); }
+        c.innerHTML = `<div class="stats-row" style="grid-template-columns:repeat(5,1fr);"><div class="stat-card"><h4>Downline</h4><div class="val">${users.length}</div></div><div class="stat-card"><h4>Bets</h4><div class="val">${sd.totalBets||0}</div></div><div class="stat-card"><h4>Won</h4><div class="val green">${sd.wonBets||0}</div></div><div class="stat-card"><h4>Lost</h4><div class="val red">${sd.lostBets||0}</div></div><div class="stat-card"><h4>Net P/L</h4><div class="val ${(sd.profit||0)>=0?'green':'red'}">${Number(sd.profit||0).toFixed(2)}</div></div></div>
+          <div class="data-card"><table class="data-table"><thead><tr><th>User</th><th>Role</th><th>Bets</th><th>Won</th><th>Lost</th><th>Stake</th><th>Payout</th><th>P/L</th></tr></thead><tbody>${rows.map(({u,d})=>`<tr><td>${u.username}</td><td>${u.role}</td><td>${d.totalBets||0}</td><td>${d.wonBets||0}</td><td>${d.lostBets||0}</td><td>${Number(d.totalStake||0).toFixed(2)}</td><td>${Number(d.totalPayout||0).toFixed(2)}</td><td style="color:${(d.profit||0)>=0?'#16a34a':'#dc2626'};font-weight:700;">${Number(d.profit||0).toFixed(2)}</td></tr>`).join('')}</tbody></table></div>`;
+      } else {
+        const r = await API.Bets.list(1, 200); let bets = r.data || [];
+        const byMatch = {};
+        bets.forEach(b => { const k = b.Match ? `${b.Match.teamA} vs ${b.Match.teamB}` : '#'+b.matchId; if(!byMatch[k]) byMatch[k]={match:k,bets:0,won:0,stake:0,payout:0}; byMatch[k].bets++; byMatch[k].stake+=Number(b.stake||0); if(b.status==='WON'){byMatch[k].won++;byMatch[k].payout+=Number(b.potentialWin||0);}});
+        const rows = Object.values(byMatch);
+        c.innerHTML = `<div class="data-card">${rows.length?`<table class="data-table"><thead><tr><th>Match</th><th>Bets</th><th>Won</th><th>Stake</th><th>Payout</th><th>P/L</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${r.match}</td><td>${r.bets}</td><td>${r.won}</td><td>${r.stake.toFixed(2)}</td><td>${r.payout.toFixed(2)}</td><td>${(r.stake-r.payout).toFixed(2)}</td></tr>`).join('')}</tbody></table>`:'<div class="empty">No data</div>'}</div>`;
+      }
+    };
+
+    // ===== BETLIST =====
+    async function renderBetList(live) {
+      const ca = document.getElementById('content-area');
+      ca.innerHTML = `
+        <div class="page-title">${live?'Bet List Live':'Bet List'}</div>
+        <div class="sport-filter">${['Cricket','Tennis','Soccer','Casino','Bet Fair','Bookmaker','Fancy','SportsBook','Tie','Toss','Parlay'].map((s,i)=>`<label><input type="radio" name="sp" value="${s}" ${i===0?'checked':''}> ${s}</label>`).join('')}</div>
+        <div class="filters-bar">
+          <span class="lbl">Bet Status</span>
+          <select id="bet-status"><option value="">${live?'Active':'All'}</option><option value="PENDING">Pending</option><option value="OPEN">Open</option><option value="WON">Won</option><option value="LOST">Lost</option><option value="REJECTED">Rejected</option></select>
+          <span class="lbl">Last</span>
+          <select><option>100 Txn</option><option>50 Txn</option></select>
+          <button class="search-btn" onclick="loadBets(${live})">Search</button>
+        </div>
+        <div class="data-card" style="padding:0;"><div id="bets-table"></div></div>
+      `;
+      loadBets(live);
+    }
+    window.loadBets = async function(live) {
+      const status = document.getElementById('bet-status')?.value || '';
+      const r = live ? await API.Bets.live() : await API.Bets.list(1, 100, status);
+      const bets = r.data || [];
+      document.getElementById('bets-table').innerHTML = `<table class="data-table"><thead><tr><th>PL ID</th><th>Bet ID</th><th>Bet placed</th><th>IP</th><th>Match</th><th>Selection</th><th>Type</th><th>Odds</th><th>Stake</th><th>Liability</th><th>P/L</th><th>Status</th><th>Action</th></tr></thead><tbody>${bets.length?bets.map(b=>`<tr><td>${b.User?.username||'-'}</td><td>BT${b.id}</td><td>${new Date(b.createdAt).toLocaleString()}</td><td>-</td><td>${b.Match?b.Match.teamA+' vs '+b.Match.teamB:'-'}</td><td>${b.selection||'-'}</td><td>${b.odds>=2?'back':'lay'}</td><td>${b.odds}</td><td>${b.stake}</td><td>${b.liability||0}</td><td style="color:${b.status==='WON'?'#16a34a':b.status==='LOST'?'#dc2626':'#6b7280'};">${b.status==='WON'?'+'+(Number(b.potentialWin)-Number(b.stake)).toFixed(2):b.status==='LOST'?'-'+Number(b.stake).toFixed(2):'0.00'}</td><td><span class="badge badge-${b.status==='WON'?'green':b.status==='LOST'?'red':'yellow'}">${b.status}</span></td><td>${['PENDING','OPEN'].includes(b.status)?`<button class="btn btn-danger" onclick="rejectBet(${b.id})">Reject</button>`:''}</td></tr>`).join(''):'<tr><td colspan="13" class="empty">No bets</td></tr>'}</tbody></table>`;
+    };
+    window.rejectBet = async function(id) { const r = await API.Bets.reject(id); r.success?(toast('Bet rejected & refunded'),loadBets(false)):toast(r.message,'error'); };
+
+    // ===== RISK MANAGEMENT =====
+    let riskTab = 'matched';
+    async function renderRiskManagement() {
+      const ca = document.getElementById('content-area');
+      const [, liveRes] = await Promise.all([API.Bets.riskSummary(), API.Bets.live()]);
+      const liveBets = liveRes.data || [];
+      const playerData = {};
+      liveBets.forEach(b => { const uid = b.User?.username || `User#${b.userId}`; if(!playerData[uid]) playerData[uid]={uid,stake:0,exposure:0}; playerData[uid].stake+=Number(b.stake||0); playerData[uid].exposure+=Number(b.liability||0); });
+      const matched = Object.values(playerData).sort((a,b)=>b.stake-a.stake).slice(0,10);
+      const exposed = Object.values(playerData).sort((a,b)=>b.exposure-a.exposure).slice(0,10);
+
+      ca.innerHTML = `
+        <div class="page-title">Risk Management Summary</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+          <div class="risk-section">
+            <div class="risk-tabs">
+              <div class="tab ${riskTab==='matched'?'active':''}" onclick="riskTab='matched';renderRiskManagement()">Top 10 Matched Amount Player</div>
+              <div class="tab ${riskTab==='exposure'?'active':''}" onclick="riskTab='exposure';renderRiskManagement()">Top 10 Exposure Player</div>
+            </div>
+            <table class="risk-table"><thead><tr><th>UID</th><th style="text-align:right;">Exposure</th><th style="text-align:right;">Matched ▼</th></tr></thead><tbody>${(riskTab==='matched'?matched:exposed).length?(riskTab==='matched'?matched:exposed).map(p=>`<tr><td>${p.uid}</td><td style="text-align:right;color:#dc2626;">${p.exposure.toFixed(2)}</td><td style="text-align:right;font-weight:600;">${p.stake.toFixed(2)}</td></tr>`).join(''):'<tr><td colspan="3" class="no-data">No records</td></tr>'}</tbody></table>
+          </div>
+          <div class="risk-section">
+            <div class="risk-header"><span>Horse Racing & Greyhound Racing</span></div>
+            <table class="risk-table"><thead><tr><th>Type</th><th>Country</th><th>Events</th><th style="text-align:right;">Matched</th></tr></thead><tbody><tr><td colspan="4" class="no-data">No data</td></tr></tbody></table>
+          </div>
+        </div>
+        ${['Match Odds','Sports Book','Premium Cricket','Binary','Other Markets','Fancy bet'].map(name => `<div class="risk-section"><div class="risk-header"><span>${name}</span><div class="acts"><button onclick="renderRiskManagement()"><i class="fas fa-sync"></i></button></div></div><table class="risk-table"><thead><tr><th>Sports</th><th>Date</th><th>Event</th>${name==='Fancy bet'?'<th class="pl" colspan="2">Player P/L</th>':name==='Match Odds'?'<th class="pl" colspan="3">Player P/L</th>':name==='Binary'?'<th class="pl">Player P/L</th><th class="dl">Books</th>':'<th style="text-align:right;">Matched</th>'}${name==='Match Odds'||name==='Fancy bet'?'<th class="dl">Downline P/L</th>':''}</tr>${name==='Match Odds'?'<tr><th class="pl">1</th><th class="pl">X</th><th class="pl">2</th></tr>':name==='Fancy bet'?'<tr><th class="pl">MIN</th><th class="pl">MAX</th></tr>':''}</thead><tbody><tr><td colspan="${name==='Match Odds'?7:name==='Fancy bet'?6:name==='Binary'?5:4}" class="no-data">No Record Found</td></tr></tbody></table></div>`).join('')}
+      `;
+    }
+
+    // ===== BANKING =====
+    async function renderBanking() {
+      const r = await API.Users.downline();
+      const users = r.data || [];
+      document.getElementById('content-area').innerHTML = `
+        <div class="page-title">Banking</div>
+        <div class="filters-bar"><input class="search" placeholder="Find member..."><button class="search-btn">Search</button><span class="lbl">Status</span><select><option>Active</option></select><button class="refresh-icon" onclick="renderBanking()"><i class="fas fa-sync"></i></button></div>
+        <div style="background:white;padding:14px;border-radius:4px;margin-bottom:10px;font-size:13px;"><b>Your Balance</b>&nbsp;PBU <span style="font-size:18px;font-weight:700;">${Number(currentUser.wallet?.balance||0).toFixed(2)}</span></div>
+        <div class="data-card"><table class="data-table"><thead><tr><th>UID</th><th>Balance</th><th>Available D/W</th><th>Exposure</th><th>Deposit / Withdraw</th><th>Credit Ref.</th><th>Ref. P/L</th><th>Remark</th><th>Logs</th></tr></thead><tbody>${users.length?users.map(u=>`<tr><td>${u.username}</td><td>${Number(u.wallet?.balance||0).toFixed(2)}</td><td>0.00</td><td>0.00</td><td><div class="dw-cell"><button class="dw-btn d" onclick="quickDW(${u.id},'D')">D</button><button class="dw-btn w" onclick="quickDW(${u.id},'W')">W</button><input id="amt-${u.id}" type="number" placeholder="Amount"><button class="full" onclick="quickFull(${u.id})">Full</button></div></td><td>0.00</td><td>0</td><td><input class="input" placeholder="Remark"></td><td><button class="dw-btn">Log</button></td></tr>`).join(''):'<tr><td colspan="9" class="empty">No users</td></tr>'}<tr style="font-weight:700;background:#fafbfc;"><td>Total</td><td>${users.reduce((s,u)=>s+Number(u.wallet?.balance||0),0).toFixed(2)}</td><td>0.00</td><td>0.00</td><td></td><td>0.00</td><td>${users.reduce((s,u)=>s+Number(u.wallet?.balance||0),0).toFixed(2)}</td><td></td><td></td></tr></tbody></table></div>
+      `;
+    }
+    window.quickDW = async function(uid, type) {
+      const a = document.getElementById('amt-'+uid).value; if(!a) return toast('Enter amount','error');
+      const r = type==='D' ? await API.Banking.depositManual(uid, Number(a)) : await API.Banking.withdrawManual(uid, Number(a));
+      r.success ? (toast(`${type==='D'?'Deposited':'Withdrew'}!`), renderBanking(), refreshAll()) : toast(r.message,'error');
+    };
+    window.quickFull = function(uid) { const u = allDownlineUsers.find(x=>x.id===uid); if(u) document.getElementById('amt-'+uid).value = Number(u.wallet?.balance||0).toFixed(2); };
+
+    // ===== BANKING METHOD =====
+    async function renderBankingMethod() {
+      const r = await API.Banking.methods();
+      const methods = r.data || [];
+      document.getElementById('content-area').innerHTML = `
+        <div class="page-title">Banking Methods</div>
+        <div class="filters-bar"><div class="right-actions"><button class="add-btn" onclick="openAddMethod()"><i class="fas fa-plus"></i> Add Method</button></div></div>
+        <div class="data-card"><table class="data-table"><thead><tr><th>Name</th><th>Type</th><th>Account</th><th>Min/Max</th><th>Active</th><th>Actions</th></tr></thead><tbody>${methods.length?methods.map(m=>`<tr><td>${m.name}</td><td><span class="role-badge badge-MA">${m.type}</span></td><td>${m.accountNumber}</td><td>${m.minAmount}/${m.maxAmount}</td><td>${m.isActive?'<span class="status-active">Yes</span>':'<span class="status-inactive">No</span>'}</td><td><button class="ic" onclick="deleteMethod(${m.id})"><i class="fas fa-trash"></i></button></td></tr>`).join(''):'<tr><td colspan="6" class="empty">No banking methods</td></tr>'}</tbody></table></div>
+      `;
+    }
+    window.openAddMethod = function() {
+      openModal('Add Banking Method', `
+        <div class="form-group"><label>Name</label><input class="input" id="bm-name"></div>
+        <div class="form-group"><label>Type</label><select class="input" id="bm-type"><option>BKASH</option><option>NAGAD</option><option>ROCKET</option><option>CRYPTO</option><option>BANK</option></select></div>
+        <div class="form-group"><label>Account Number</label><input class="input" id="bm-acc"></div>
+        <div class="form-group"><label>Account Name</label><input class="input" id="bm-name2"></div>
+      `, async () => {
+        const r = await API.Banking.createMethod({ name: document.getElementById('bm-name').value, type: document.getElementById('bm-type').value, accountNumber: document.getElementById('bm-acc').value, accountName: document.getElementById('bm-name2').value });
+        r.success ? (toast('Method added!'), closeModal(), renderBankingMethod()) : toast(r.message,'error');
+      });
+    };
+    window.deleteMethod = async function(id) { const r = await API.Banking.deleteMethod(id); r.success?(toast('Deleted'),renderBankingMethod()):toast(r.message,'error'); };
+
+    // ===== BLOCK MARKET =====
+    async function renderBlockMarket() {
+      const r = await API.Matches.markets();
+      const markets = r.data || [];
+      document.getElementById('content-area').innerHTML = `
+        <div class="page-title">Block Market</div>
+        <div class="data-card"><table class="data-table"><thead><tr><th>S.No.</th><th>ID</th><th>Name</th><th>Match</th><th>Type</th><th>Status</th><th>Action</th></tr></thead><tbody>${markets.length?markets.map((m,i)=>`<tr><td>${i+1}</td><td>${m.id}</td><td>${m.name}</td><td>${m.Match?m.Match.teamA+' vs '+m.Match.teamB:'-'}</td><td>${m.type||'WINNER'}</td><td>${m.status&&!m.isSuspended?'Open':'Blocked'}</td><td><label class="toggle-switch"><input type="checkbox" ${m.status&&!m.isSuspended?'checked':''} onchange="toggleMarket(${m.id},this.checked)"><span class="toggle-slider"></span></label></td></tr>`).join(''):'<tr><td colspan="7" class="empty">No markets</td></tr>'}</tbody></table></div>
+      `;
+    }
+    window.toggleMarket = async function(id, checked) {
+      const r = checked ? await API.Matches.unblockMarket(id) : await API.Matches.blockMarket(id);
+      r.success ? toast(`Market ${checked?'unblocked':'blocked'}`) : toast(r.message,'error');
+    };
+
+    // ===== ADD MATCH =====
+    async function renderAddMatch() {
+      const lr = await API.Matches.leagues();
+      const leagues = lr.data || [];
+      document.getElementById('content-area').innerHTML = `
+        <div class="page-title">Add Match</div>
+        <div class="data-card" style="padding:25px;max-width:600px;">
+          <div class="form-group"><label>League</label><select class="input" id="am-league">${leagues.map(l=>`<option value="${l.id}">${l.name}</option>`).join('')}</select></div>
+          <div class="form-group"><label>Team A</label><input class="input" id="am-teamA"></div>
+          <div class="form-group"><label>Team B</label><input class="input" id="am-teamB"></div>
+          <div class="form-group"><label>Start Time</label><input class="input" id="am-start" type="datetime-local"></div>
+          <button class="btn btn-primary" onclick="createMatch()"><i class="fas fa-plus"></i> Create Match</button>
+        </div>
+      `;
+    }
+    window.createMatch = async function() {
+      const r = await API.Matches.create({ leagueId: Number(document.getElementById('am-league').value), teamA: document.getElementById('am-teamA').value, teamB: document.getElementById('am-teamB').value, startTime: document.getElementById('am-start').value });
+      r.success ? toast('Match created!') : toast(r.message,'error');
+    };
+
+    // ===== COMPANY PAYMENT =====
+    async function renderCompanyPayment() {
+      const r = await API.CompanyPayment.summary().catch(()=>({success:false}));
+      const d = r.data || {};
+      document.getElementById('content-area').innerHTML = `
+        <div class="page-title">Company Payment</div>
+        <div class="stats-row" style="grid-template-columns:repeat(6,1fr);">
+          <div class="stat-card"><h4>Total Deposits</h4><div class="val green">PBU ${Number(d.totalDeposits||0).toFixed(2)}</div></div>
+          <div class="stat-card"><h4>Total Withdrawals</h4><div class="val red">PBU ${Number(d.totalWithdrawals||0).toFixed(2)}</div></div>
+          <div class="stat-card"><h4>Net Position</h4><div class="val">PBU ${Number(d.netPosition||0).toFixed(2)}</div></div>
+          <div class="stat-card"><h4>Commission Paid</h4><div class="val">PBU ${Number(d.totalCommissionPayout||0).toFixed(2)}</div></div>
+          <div class="stat-card"><h4>Settlements</h4><div class="val">PBU ${Number(d.totalSettlement||0).toFixed(2)}</div></div>
+          <div class="stat-card"><h4>Pending</h4><div class="val">${d.pendingPayments||0}</div></div>
+        </div>
+      `;
+    }
+
+    // ===== RESULT =====
+    async function renderResult() {
+      const r = await API.Results.pending();
+      const matches = r.data || [];
+      document.getElementById('content-area').innerHTML = `
+        <div class="page-title">Declare Result</div>
+        <div class="data-card" style="padding:15px;">
+          ${matches.length?matches.map(m=>`<div style="border:1px solid #e5e7eb;padding:12px;border-radius:4px;margin-bottom:10px;"><div style="font-weight:600;margin-bottom:8px;">${m.teamA} vs ${m.teamB} <span style="color:#6b7280;font-size:11px;">(${m.Bets?.length||0} pending bets)</span></div><div style="display:flex;gap:8px;align-items:center;"><input class="input" id="win-${m.id}" placeholder="Winning selection (e.g. ${m.teamA} Win)" style="flex:1;"><button class="btn btn-primary" onclick="declareRes(${m.id})">Declare</button></div></div>`).join(''):'<div class="empty">No matches pending result</div>'}
+        </div>
+      `;
+    }
+    window.declareRes = async function(matchId) {
+      const sel = document.getElementById('win-'+matchId).value;
+      if (!sel) return toast('Enter winning selection','error');
+      const r = await API.Results.declare({ matchId, winningSelection: sel });
+      r.success ? (toast('Result declared!'), renderResult()) : toast(r.message,'error');
+    };
+
+    // ===== OLD RESULT =====
+    async function renderOldResult() {
+      const r = await API.Results.history();
+      const results = r.data || [];
+      document.getElementById('content-area').innerHTML = `
+        <div class="page-title">Result History</div>
+        <div class="data-card"><table class="data-table"><thead><tr><th>ID</th><th>Match</th><th>Winner</th><th>Status</th><th>Declared</th><th>Action</th></tr></thead><tbody>${results.length?results.map(r=>`<tr><td>#${r.id}</td><td>${r.Match?r.Match.teamA+' vs '+r.Match.teamB:'#'+r.matchId}</td><td>${r.winningSelection}</td><td><span class="badge badge-${r.status==='DECLARED'?'green':r.status==='SUSPENDED'?'yellow':'red'}">${r.status}</span></td><td>${new Date(r.declaredAt).toLocaleString()}</td><td>${r.status==='DECLARED'?`<button class="btn btn-orange" onclick="holdResult(${r.id})">Hold</button>`:r.status==='SUSPENDED'?`<button class="btn btn-success" onclick="releaseResult(${r.id})">Release</button> <button class="btn btn-danger" onclick="rollbackResult(${r.id})">Rollback</button>`:''}</td></tr>`).join(''):'<tr><td colspan="6" class="empty">No results</td></tr>'}</tbody></table></div>
+      `;
+    }
+    window.holdResult = async function(id) { const r = await API.Results.hold(id); r.success?(toast('Held'),renderOldResult()):toast(r.message,'error'); };
+    window.releaseResult = async function(id) { const r = await API.Results.release(id); r.success?(toast('Released'),renderOldResult()):toast(r.message,'error'); };
+    window.rollbackResult = async function(id) { const r = await API.Results.rollback(id); r.success?(toast('Rolled back'),renderOldResult()):toast(r.message,'error'); };
+
+    // ===== DEPOSIT REQUESTS =====
+    async function renderDepositRequests() {
+      const r = await API.Banking.depositRequests('PENDING');
+      const reqs = r.data || [];
+      document.getElementById('content-area').innerHTML = `
+        <div class="page-title">Deposit Requests</div>
+        <div class="data-card"><table class="data-table"><thead><tr><th>ID</th><th>User</th><th>Amount</th><th>Method</th><th>TxnID</th><th>Status</th><th>Date</th><th>Action</th></tr></thead><tbody>${reqs.length?reqs.map(r=>`<tr><td>#${r.id}</td><td>${r.User?.username||r.userId}</td><td>PBU ${r.amount}</td><td>${r.methodName||'-'}</td><td>${r.transactionId||'-'}</td><td><span class="badge badge-yellow">${r.status}</span></td><td>${new Date(r.createdAt).toLocaleString()}</td><td><button class="btn btn-success" onclick="approveDep(${r.id})">Approve</button> <button class="btn btn-danger" onclick="rejectDep(${r.id})">Reject</button></td></tr>`).join(''):'<tr><td colspan="8" class="empty">No pending requests</td></tr>'}</tbody></table></div>
+      `;
+    }
+    window.approveDep = async function(id) { const r = await API.Banking.approveDeposit(id); r.success?(toast('Approved!'),renderDepositRequests(),refreshAll()):toast(r.message,'error'); };
+    window.rejectDep = async function(id) { const r = await API.Banking.rejectDeposit(id); r.success?(toast('Rejected'),renderDepositRequests()):toast(r.message,'error'); };
+
+    // ===== WITHDRAW REQUESTS =====
+    async function renderWithdrawRequests() {
+      const r = await API.Banking.withdrawRequests('PENDING');
+      const reqs = r.data || [];
+      document.getElementById('content-area').innerHTML = `
+        <div class="page-title">Withdraw Requests</div>
+        <div class="data-card"><table class="data-table"><thead><tr><th>ID</th><th>User</th><th>Amount</th><th>Method</th><th>Account</th><th>Status</th><th>Date</th><th>Action</th></tr></thead><tbody>${reqs.length?reqs.map(r=>`<tr><td>#${r.id}</td><td>${r.User?.username||r.userId}</td><td>PBU ${r.amount}</td><td>${r.methodName||'-'}</td><td>${r.accountNumber||'-'}</td><td><span class="badge badge-yellow">${r.status}</span></td><td>${new Date(r.createdAt).toLocaleString()}</td><td><button class="btn btn-success" onclick="approveWd(${r.id})">Approve</button> <button class="btn btn-orange" onclick="holdWd(${r.id})">Hold</button> <button class="btn btn-danger" onclick="rejectWd(${r.id})">Reject</button></td></tr>`).join(''):'<tr><td colspan="8" class="empty">No pending requests</td></tr>'}</tbody></table></div>
+      `;
+    }
+    window.approveWd = async function(id) { const r = await API.Banking.approveWithdraw(id); r.success?(toast('Approved!'),renderWithdrawRequests(),refreshAll()):toast(r.message,'error'); };
+    window.holdWd = async function(id) { const r = await API.Banking.holdWithdraw(id); r.success?(toast('Held'),renderWithdrawRequests()):toast(r.message,'error'); };
+    window.rejectWd = async function(id) { const r = await API.Banking.rejectWithdraw(id); r.success?(toast('Rejected'),renderWithdrawRequests()):toast(r.message,'error'); };
+
+    // ===== AFFILIATE WITHDRAW (downline-scoped) =====
+    let _affWdState = { status: 'ALL', search: '' };
+
+    async function renderAffiliateWithdraw() {
+      document.getElementById('content-area').innerHTML = `
+        <div class="filters-bar">
+          <input class="search" id="aff-wd-search" placeholder="Find member..." onkeyup="if(event.key==='Enter')affWdSearch()">
+          <button class="search-btn" onclick="affWdSearch()">Search</button>
+          <span class="lbl">Status</span>
+          <select id="aff-wd-status" onchange="affWdReload()">
+            <option value="ALL">ALL</option>
+            <option value="PENDING">PENDING</option>
+            <option value="APPROVED">APPROVED</option>
+            <option value="REJECTED">REJECTED</option>
+            <option value="HOLD">HOLD</option>
+          </select>
+          <div class="right-actions"><button class="refresh-icon" onclick="affWdReload()" title="Refresh"><i class="fas fa-sync"></i></button></div>
+        </div>
+        <div class="stats-row" id="aff-wd-stats">
+          <div class="stat-card"><h4>Today</h4><div class="val green" id="aff-s-today">0.00</div></div>
+          <div class="stat-card"><h4>Yesterday</h4><div class="val red" id="aff-s-yest">0.00</div></div>
+          <div class="stat-card"><h4>This week</h4><div class="val green" id="aff-s-tw">0.00</div></div>
+          <div class="stat-card"><h4>Last week</h4><div class="val red" id="aff-s-lw">0.00</div></div>
+          <div class="stat-card"><h4>This month</h4><div class="val green" id="aff-s-tm">0.00</div></div>
+          <div class="stat-card"><h4>Last Month</h4><div class="val red" id="aff-s-lm">0.00</div></div>
+        </div>
+        <div class="data-card">
+          <table class="data-table">
+            <thead><tr><th>No</th><th>Date</th><th>User Name</th><th>Note</th><th>Bank Type</th><th>Account Number</th><th>Amount</th><th>Status</th><th>Action</th></tr></thead>
+            <tbody id="aff-wd-body"><tr><td colspan="9" class="empty"><i class="fas fa-spinner fa-spin"></i> Loading...</td></tr></tbody>
+          </table>
+        </div>
+      `;
+      affWdReload();
+    }
+
+    window.affWdSearch = function() {
+      _affWdState.search = (document.getElementById('aff-wd-search').value || '').trim();
+      affWdReload();
+    };
+
+    window.affWdReload = async function() {
+      const statusSel = document.getElementById('aff-wd-status');
+      if (statusSel) _affWdState.status = statusSel.value;
+
+      const [list, sum] = await Promise.all([
+        API.Banking.affiliateWithdrawRequests(_affWdState.status, 1, 100, _affWdState.search),
+        API.Banking.affiliateWithdrawSummary()
+      ]);
+
+      const s = sum.data || {};
+      const fmt = (n) => Number(n||0).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
+      const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = fmt(v); };
+      set('aff-s-today', s.today);
+      set('aff-s-yest',  s.yesterday);
+      set('aff-s-tw',    s.thisWeek);
+      set('aff-s-lw',    s.lastWeek);
+      set('aff-s-tm',    s.thisMonth);
+      set('aff-s-lm',    s.lastMonth);
+
+      const rows = list.data || [];
+      const tbody = document.getElementById('aff-wd-body');
+      if (!tbody) return;
+      if (!rows.length) { tbody.innerHTML = '<tr><td colspan="9" class="empty">No data found</td></tr>'; return; }
+
+      const badgeFor = (st) => {
+        const cls = st==='APPROVED'?'badge-green':st==='REJECTED'?'badge-red':'badge-yellow';
+        return `<span class="badge ${cls}">${st}</span>`;
+      };
+
+      tbody.innerHTML = rows.map((r, i) => {
+        const note = r.rejectedReason || r.methodName || '-';
+        const isPending = r.status === 'PENDING';
+        const actions = isPending
+          ? `<button class="btn btn-success" onclick="affApproveWd(${r.id})"><i class="fas fa-check"></i></button>
+             <button class="btn btn-orange" onclick="affHoldWd(${r.id})"><i class="fas fa-pause"></i></button>
+             <button class="btn btn-danger" onclick="affRejectWd(${r.id})"><i class="fas fa-times"></i></button>`
+          : '<span style="color:#9ca3af;font-size:11px;">—</span>';
+        return `<tr>
+          <td>${i+1}</td>
+          <td>${new Date(r.createdAt).toLocaleString()}</td>
+          <td>${r.User?.username || ('#'+r.userId)}</td>
+          <td>${note}</td>
+          <td>${r.methodName || '-'}</td>
+          <td>${r.accountNumber || '-'}</td>
+          <td>PBU ${Number(r.amount).toLocaleString()}</td>
+          <td>${badgeFor(r.status)}</td>
+          <td>${actions}</td>
+        </tr>`;
+      }).join('');
+    };
+
+    window.affApproveWd = async function(id) {
+      const r = await API.Banking.affiliateApproveWithdraw(id);
+      r.success ? (toast('Approved!'), affWdReload(), refreshAll()) : toast(r.message || 'Failed', 'error');
+    };
+    window.affHoldWd = async function(id) {
+      const r = await API.Banking.affiliateHoldWithdraw(id);
+      r.success ? (toast('On hold'), affWdReload()) : toast(r.message || 'Failed', 'error');
+    };
+    window.affRejectWd = function(id) {
+      openModal('Reject Withdraw', `
+        <div class="form-group"><label>Reason (optional)</label><input class="input" id="aff-rej-reason" placeholder="Reason for rejection"></div>
+      `, async () => {
+        const reason = document.getElementById('aff-rej-reason').value || '';
+        const r = await API.Banking.affiliateRejectWithdraw(id, reason);
+        if (r.success) { toast('Rejected'); closeModal(); affWdReload(); }
+        else toast(r.message || 'Failed', 'error');
+      });
+    };
+
+    // ===== AFFILIATE KYC (downline-scoped) =====
+    let _affKycState = { status: 'ALL', search: '' };
+    let _affKycPlayers = [];
+
+    async function renderAffiliateKyc() {
+      document.getElementById('content-area').innerHTML = `
+        <div class="filters-bar">
+          <input class="search" id="aff-kyc-search" placeholder="Find member..." onkeyup="if(event.key==='Enter')affKycSearch()">
+          <button class="search-btn" onclick="affKycSearch()">Search</button>
+          <span class="lbl">Status</span>
+          <select id="aff-kyc-status" onchange="affKycReload()">
+            <option value="ALL">ALL</option>
+            <option value="NOT_SUBMITTED">Not Submitted</option>
+            <option value="SUBMITTED">Submitted</option>
+            <option value="VERIFIED">Verified</option>
+            <option value="APPROVED">Approved</option>
+            <option value="REJECTED">Rejected</option>
+          </select>
+          <div class="right-actions"><button class="refresh-icon" onclick="affKycReload()" title="Refresh"><i class="fas fa-sync"></i></button></div>
+        </div>
+        <div class="data-card">
+          <table class="data-table">
+            <thead><tr>
+              <th>Sl</th><th>Username</th><th>Full Name</th><th>Email</th><th>Phone</th>
+              <th>Kyc Status</th><th>Kyc Verified</th><th>Kyc Approved</th><th>Actions</th>
+            </tr></thead>
+            <tbody id="aff-kyc-body"><tr><td colspan="9" class="empty"><i class="fas fa-spinner fa-spin"></i> Loading...</td></tr></tbody>
+          </table>
+        </div>
+      `;
+      affKycReload();
+    }
+
+    window.affKycSearch = function() {
+      _affKycState.search = (document.getElementById('aff-kyc-search').value || '').trim();
+      affKycReload();
+    };
+
+    window.affKycReload = async function() {
+      const sel = document.getElementById('aff-kyc-status');
+      if (sel) _affKycState.status = sel.value;
+      const statusParam = _affKycState.status === 'ALL' ? '' : _affKycState.status;
+      const r = await API.Users.affiliatePlayers(statusParam, 1, 100, _affKycState.search);
+      _affKycPlayers = r.data || [];
+      const tbody = document.getElementById('aff-kyc-body');
+      if (!tbody) return;
+      if (!_affKycPlayers.length) { tbody.innerHTML = '<tr><td colspan="9" class="empty">No data found</td></tr>'; return; }
+
+      const yesNo = (v) => v ? '<span style="color:#16a34a;font-weight:700;">Yes</span>' : '<span style="color:#dc2626;font-weight:700;">No</span>';
+      const statusLabel = (s) => {
+        const map = { NOT_SUBMITTED: 'Not submitted yet', SUBMITTED: 'Submitted', VERIFIED: 'Verified', APPROVED: 'Approved', REJECTED: 'Rejected' };
+        const color = s === 'APPROVED' ? '#16a34a' : s === 'REJECTED' ? '#dc2626' : s === 'NOT_SUBMITTED' ? '#d97706' : '#2563eb';
+        return `<span style="color:${color};">${map[s] || s || 'Not submitted yet'}</span>`;
+      };
+
+      tbody.innerHTML = _affKycPlayers.map((u, i) => `
+        <tr>
+          <td>${i + 1}</td>
+          <td>${u.username}</td>
+          <td>${u.fullName || '— —'}</td>
+          <td>${u.email || '—'}</td>
+          <td>${u.phone || '—'}</td>
+          <td>${statusLabel(u.kycStatus)}</td>
+          <td>${yesNo(u.kycVerified)}</td>
+          <td>${u.kycApproved ? yesNo(true) : '—'}</td>
+          <td><div class="action-icons">
+            <button class="ic" title="View KYC" onclick="viewKyc(${u.id})"><i class="fas fa-eye"></i></button>
+            <button class="ic" title="Edit KYC" onclick="editKyc(${u.id})"><i class="fas fa-pencil-alt"></i></button>
+          </div></td>
+        </tr>
+      `).join('');
+    };
+
+    window.viewKyc = async function(id) {
+      const r = await API.Users.getKyc(id);
+      if (!r.success) return toast(r.message || 'Failed to load KYC', 'error');
+      const u = r.data;
+      const fmt = (d) => d ? new Date(d).toLocaleString() : '—';
+      const docs = Array.isArray(u.kycDocuments) && u.kycDocuments.length
+        ? `<ul style="padding-left:18px;margin-top:6px;">${u.kycDocuments.map(d => `<li>${d.type || 'document'} — ${d.url ? `<a href="${d.url}" target="_blank">view</a>` : 'no link'} <span style="color:#6b7280;font-size:11px;">(${fmt(d.uploadedAt)})</span></li>`).join('')}</ul>`
+        : '<div style="color:#6b7280;font-size:12px;margin-top:6px;">No documents uploaded</div>';
+      openModal(`KYC: ${u.username}`, `
+        <div class="data-list">
+          <div class="data-row"><b>Full Name</b><span>${u.fullName || '—'}</span></div>
+          <div class="data-row"><b>Email</b><span>${u.email || '—'}</span></div>
+          <div class="data-row"><b>Phone</b><span>${u.phone || '—'}</span></div>
+          <div class="data-row"><b>Status</b><span>${u.kycStatus || 'NOT_SUBMITTED'}</span></div>
+          <div class="data-row"><b>Verified</b><span>${u.kycVerified ? 'Yes' : 'No'}</span></div>
+          <div class="data-row"><b>Approved</b><span>${u.kycApproved ? 'Yes' : 'No'}</span></div>
+          <div class="data-row"><b>Submitted At</b><span>${fmt(u.kycSubmittedAt)}</span></div>
+          <div class="data-row"><b>Verified At</b><span>${fmt(u.kycVerifiedAt)}</span></div>
+          <div class="data-row"><b>Approved At</b><span>${fmt(u.kycApprovedAt)}</span></div>
+          <div class="data-row"><b>Rejected Reason</b><span>${u.kycRejectedReason || '—'}</span></div>
+        </div>
+        <h3 style="font-size:13px;margin-top:14px;border-bottom:none;padding-bottom:0;">Documents</h3>
+        ${docs}
+      `, () => closeModal());
+    };
+
+    window.editKyc = async function(id) {
+      const r = await API.Users.getKyc(id);
+      if (!r.success) return toast(r.message || 'Failed to load KYC', 'error');
+      const u = r.data;
+      const opt = (v, label) => `<option value="${v}" ${u.kycStatus === v ? 'selected' : ''}>${label}</option>`;
+      openModal(`Update KYC: ${u.username}`, `
+        <div class="form-group"><label>Status</label>
+          <select class="input" id="kyc-status">
+            ${opt('NOT_SUBMITTED','Not Submitted')}
+            ${opt('SUBMITTED','Submitted')}
+            ${opt('VERIFIED','Verified')}
+            ${opt('APPROVED','Approved')}
+            ${opt('REJECTED','Rejected')}
+          </select>
+        </div>
+        <div class="form-group"><label><input type="checkbox" id="kyc-verified" ${u.kycVerified ? 'checked' : ''}> Verified</label></div>
+        <div class="form-group"><label><input type="checkbox" id="kyc-approved" ${u.kycApproved ? 'checked' : ''}> Approved</label></div>
+        <div class="form-group"><label>Rejected Reason (only used when status = REJECTED)</label>
+          <input class="input" id="kyc-reason" value="${u.kycRejectedReason || ''}" placeholder="Reason">
+        </div>
+      `, async () => {
+        const payload = {
+          kycStatus: document.getElementById('kyc-status').value,
+          kycVerified: document.getElementById('kyc-verified').checked,
+          kycApproved: document.getElementById('kyc-approved').checked,
+          kycRejectedReason: document.getElementById('kyc-reason').value || null
+        };
+        const res = await API.Users.updateKyc(id, payload);
+        if (res.success) { toast('KYC updated!'); closeModal(); affKycReload(); }
+        else toast(res.message || 'Failed', 'error');
+      });
+    };
+
+    // ===== SITE CMS (OWNER) =====
+    function _cmsImageInput(idPrefix, currentUrl) {
+      return `
+        <div class="form-group">
+          <label>Image</label>
+          <input class="input" id="${idPrefix}-url" placeholder="/uploads/... or full URL" value="${currentUrl || ''}">
+          <input type="file" accept="image/*" id="${idPrefix}-file" style="margin-top:6px;font-size:12px;"
+            onchange="cmsHandleUpload(this,'${idPrefix}-url','${idPrefix}-preview')">
+          <div id="${idPrefix}-preview" style="margin-top:8px;">${currentUrl ? `<img src="${cmsImg(currentUrl)}" style="max-height:60px;border-radius:4px;">` : ''}</div>
+        </div>
+      `;
+    }
+    function cmsImg(u) {
+      if (!u) return '';
+      if (/^https?:/.test(u)) return u;
+      const host = (window.API && window.API.HOST) || 'http://localhost:3000';
+      return host + (u.startsWith('/') ? u : '/' + u);
+    }
+    window.cmsHandleUpload = async function(fileEl, urlElId, previewId) {
+      const f = fileEl.files && fileEl.files[0]; if (!f) return;
+      toast('Uploading...');
+      const r = await API.Upload.image(f);
+      if (!r.success) return toast(r.message || 'Upload failed', 'error');
+      const url = r.data.url;
+      const urlEl = document.getElementById(urlElId); if (urlEl) urlEl.value = url;
+      const prev = document.getElementById(previewId);
+      if (prev) prev.innerHTML = `<img src="${cmsImg(url)}" style="max-height:60px;border-radius:4px;">`;
+      toast('Uploaded!');
+    };
+
+    // ----- Branding & Theme -----
+    async function renderCmsBranding() {
+      const [b, t] = await Promise.all([API.Website.branding(), API.Website.theme()]);
+      const br = b.data || {}; const th = t.data || {};
+      document.getElementById('content-area').innerHTML = `
+        <div class="page-title">Branding &amp; Theme</div>
+        <div class="data-card" style="padding:22px;max-width:760px;">
+          <h3 style="font-size:14px;margin-bottom:14px;">Branding</h3>
+          <div class="form-group"><label>Site Name</label><input class="input" id="br-name" value="${br.siteName || 'BetX365'}"></div>
+          <div class="form-group"><label>Tagline</label><input class="input" id="br-tagline" value="${br.tagline || ''}"></div>
+          ${_cmsImageInput('br-logo', br.logoUrl)}
+          ${_cmsImageInput('br-fav',  br.faviconUrl)}
+          <button class="btn btn-success" onclick="cmsSaveBranding()"><i class="fas fa-save"></i> Save Branding</button>
+          <hr style="margin:20px 0;border:none;border-top:1px solid #eee;">
+          <h3 style="font-size:14px;margin-bottom:14px;">Theme Colors</h3>
+          <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;">
+            ${['primary','accent','bg','surface','text','success','danger'].map(k =>
+              `<div class="form-group" style="margin:0;"><label>${k}</label>
+                 <input class="input" type="color" id="th-${k}" value="${th[k] || '#000000'}" style="height:40px;padding:4px;">
+              </div>`).join('')}
+          </div>
+          <button class="btn btn-success" style="margin-top:14px;" onclick="cmsSaveTheme()"><i class="fas fa-save"></i> Save Theme</button>
+        </div>
+      `;
+    }
+    window.cmsSaveBranding = async function() {
+      const payload = {
+        siteName: document.getElementById('br-name').value,
+        tagline: document.getElementById('br-tagline').value,
+        logoUrl: document.getElementById('br-logo-url').value,
+        faviconUrl: document.getElementById('br-fav-url').value
+      };
+      const r = await API.Website.updateBranding(payload);
+      r.success ? toast('Branding saved!') : toast(r.message || 'Failed', 'error');
+    };
+    window.cmsSaveTheme = async function() {
+      const payload = {};
+      ['primary','accent','bg','surface','text','success','danger'].forEach(k => {
+        payload[k] = document.getElementById('th-' + k).value;
+      });
+      const r = await API.Website.updateTheme(payload);
+      r.success ? toast('Theme saved!') : toast(r.message || 'Failed', 'error');
+    };
+
+    // ----- Domains -----
+    async function renderCmsDomains() {
+      const r = await API.Website.domains();
+      const list = r.data || [];
+      document.getElementById('content-area').innerHTML = `
+        <div class="page-title">Domains</div>
+        <div class="data-card" style="padding:18px;">
+          <table class="data-table">
+            <thead><tr><th>#</th><th>URL</th><th>Label</th><th>Active</th><th>Action</th></tr></thead>
+            <tbody id="dom-body">
+              ${list.length ? list.map((d,i)=>`<tr>
+                <td>${i+1}</td>
+                <td><input class="input" value="${d.url||''}" data-i="${i}" data-f="url"></td>
+                <td><input class="input" value="${d.label||''}" data-i="${i}" data-f="label"></td>
+                <td><input type="checkbox" ${d.active?'checked':''} data-i="${i}" data-f="active"></td>
+                <td><button class="btn btn-danger" onclick="cmsDomDelete(${i})"><i class="fas fa-trash"></i></button></td>
+              </tr>`).join('') : '<tr><td colspan="5" class="empty">No domains</td></tr>'}
+            </tbody>
+          </table>
+          <div style="display:flex;gap:8px;margin-top:12px;">
+            <button class="btn btn-primary" onclick="cmsDomAdd()"><i class="fas fa-plus"></i> Add Row</button>
+            <button class="btn btn-success" onclick="cmsDomSave()"><i class="fas fa-save"></i> Save</button>
+          </div>
+        </div>
+      `;
+      window._cmsDomains = list;
+    }
+    function _cmsCollectDomains() {
+      const rows = document.querySelectorAll('#dom-body tr');
+      const out = [];
+      rows.forEach(tr => {
+        const inputs = tr.querySelectorAll('[data-f]');
+        if (!inputs.length) return;
+        const obj = {};
+        inputs.forEach(inp => {
+          obj[inp.dataset.f] = inp.type === 'checkbox' ? inp.checked : inp.value;
+        });
+        out.push(obj);
+      });
+      return out;
+    }
+    window.cmsDomAdd = function() {
+      const list = _cmsCollectDomains();
+      list.push({ url:'', label:'', active:true });
+      window._cmsDomains = list;
+      renderCmsDomainsFromList(list);
+    };
+    window.cmsDomDelete = function(i) {
+      const list = _cmsCollectDomains();
+      list.splice(i,1);
+      renderCmsDomainsFromList(list);
+    };
+    function renderCmsDomainsFromList(list) {
+      document.getElementById('dom-body').innerHTML = list.length ? list.map((d,i)=>`<tr>
+        <td>${i+1}</td>
+        <td><input class="input" value="${d.url||''}" data-i="${i}" data-f="url"></td>
+        <td><input class="input" value="${d.label||''}" data-i="${i}" data-f="label"></td>
+        <td><input type="checkbox" ${d.active?'checked':''} data-i="${i}" data-f="active"></td>
+        <td><button class="btn btn-danger" onclick="cmsDomDelete(${i})"><i class="fas fa-trash"></i></button></td>
+      </tr>`).join('') : '<tr><td colspan="5" class="empty">No domains</td></tr>';
+    }
+    window.cmsDomSave = async function() {
+      const list = _cmsCollectDomains();
+      const r = await API.Website.updateDomains(list);
+      r.success ? toast('Domains saved!') : toast(r.message || 'Failed', 'error');
+    };
+
+    // ----- Games -----
+    async function renderCmsGames() {
+      const r = await API.Website.games();
+      const list = r.data || [];
+      document.getElementById('content-area').innerHTML = `
+        <div class="filters-bar">
+          <span class="lbl">Games (${list.length})</span>
+          <div class="right-actions">
+            <button class="btn btn-primary" onclick="cmsGameOpen()"><i class="fas fa-plus"></i> Add Game</button>
+          </div>
+        </div>
+        <div class="data-card">
+          <table class="data-table">
+            <thead><tr><th>Image</th><th>Name</th><th>Provider</th><th>Category</th><th>Badge</th><th>Order</th><th>Active</th><th>Action</th></tr></thead>
+            <tbody>
+              ${list.length ? list.map(g => `<tr>
+                <td>${g.imageUrl ? `<img src="${cmsImg(g.imageUrl)}" style="height:42px;border-radius:4px;">` : '—'}</td>
+                <td>${g.name || '-'}</td>
+                <td>${g.provider || '-'}</td>
+                <td>${g.category || '-'}</td>
+                <td>${g.badge || '-'}</td>
+                <td>${g.sortOrder ?? 0}</td>
+                <td>
+                  <button onclick="cmsGameToggleActive(${g.id})" title="Click to toggle visibility on player site"
+                    style="cursor:pointer;border:none;padding:4px 14px;border-radius:14px;font-weight:700;font-size:11px;background:${g.active ? '#16a34a' : '#dc2626'};color:white;">
+                    ${g.active ? 'ON' : 'OFF'}
+                  </button>
+                </td>
+                <td><div class="action-icons">
+                  <button class="ic" title="Edit" onclick="cmsGameOpen(${g.id})"><i class="fas fa-pencil-alt"></i></button>
+                  <button class="ic" title="Delete" onclick="cmsGameDelete(${g.id})"><i class="fas fa-trash"></i></button>
+                </div></td>
+              </tr>`).join('') : '<tr><td colspan="8" class="empty">No games yet</td></tr>'}
+            </tbody>
+          </table>
+        </div>
+      `;
+      window._cmsGames = list;
+    }
+    window.cmsGameOpen = function(id) {
+      const list = window._cmsGames || [];
+      const g = id ? list.find(x => x.id === id) : { name:'', provider:'', category:'slots', badge:'', imageUrl:'', sortOrder: list.length, active:true };
+      openModal(id ? 'Edit Game' : 'Add Game', `
+        <div class="form-group"><label>Name</label><input class="input" id="gm-name" value="${g.name||''}"></div>
+        <div class="form-group"><label>Provider</label><input class="input" id="gm-prov" value="${g.provider||''}"></div>
+        <div class="form-group"><label>Category</label>
+          <select class="input" id="gm-cat">
+            ${['slots','live','crash','sports','fishing','table'].map(c =>
+              `<option value="${c}" ${g.category===c?'selected':''}>${c}</option>`).join('')}
+          </select>
+        </div>
+        <div class="form-group"><label>Badge</label><input class="input" id="gm-badge" value="${g.badge||''}" placeholder="e.g. NEW, HOT"></div>
+        ${_cmsImageInput('gm-img', g.imageUrl)}
+        <div class="form-group"><label>Sort Order</label><input class="input" id="gm-order" type="number" value="${g.sortOrder ?? 0}"></div>
+        <div class="form-group"><label><input type="checkbox" id="gm-active" ${g.active?'checked':''}> Active</label></div>
+      `, async () => {
+        const payload = {
+          name: document.getElementById('gm-name').value,
+          provider: document.getElementById('gm-prov').value,
+          category: document.getElementById('gm-cat').value,
+          badge: document.getElementById('gm-badge').value,
+          imageUrl: document.getElementById('gm-img-url').value,
+          sortOrder: Number(document.getElementById('gm-order').value || 0),
+          active: document.getElementById('gm-active').checked
+        };
+        const r = id ? await API.Website.updateGame(id, payload) : await API.Website.addGame(payload);
+        if (r.success) { toast('Saved!'); closeModal(); renderCmsGames(); }
+        else toast(r.message || 'Failed', 'error');
+      });
+    };
+    window.cmsGameDelete = async function(id) {
+      if (!confirm('Delete this game?')) return;
+      const r = await API.Website.deleteGame(id);
+      r.success ? (toast('Deleted'), renderCmsGames()) : toast(r.message || 'Failed', 'error');
+    };
+    window.cmsGameToggleActive = async function(id) {
+      const list = window._cmsGames || [];
+      const g = list.find(x => x.id === id);
+      if (!g) return;
+      const next = !g.active;
+      const r = await API.Website.updateGame(id, { active: next });
+      if (r.success) { toast(next ? 'Now visible on player site' : 'Hidden from player site'); renderCmsGames(); }
+      else toast(r.message || 'Failed', 'error');
+    };
+
+    // ----- Hero Banners -----
+    async function renderCmsBanners() {
+      const r = await API.Website.banners();
+      const list = r.data || [];
+      document.getElementById('content-area').innerHTML = `
+        <div class="filters-bar">
+          <span class="lbl">Hero Banners (${list.length})</span>
+          <div class="right-actions">
+            <button class="btn btn-primary" onclick="cmsBannerOpen()"><i class="fas fa-plus"></i> Add Banner</button>
+          </div>
+        </div>
+        <div class="data-card">
+          <table class="data-table">
+            <thead><tr><th>Image</th><th>Title</th><th>Subtitle</th><th>Amount</th><th>CTA</th><th>Action</th></tr></thead>
+            <tbody>
+              ${list.length ? list.map(b => `<tr>
+                <td>${b.imageUrl ? `<img src="${cmsImg(b.imageUrl)}" style="height:42px;border-radius:4px;">` : '—'}</td>
+                <td>${b.title || '-'}</td>
+                <td>${b.subtitle || '-'}</td>
+                <td>${b.amount || '-'}</td>
+                <td>${b.cta || '-'}</td>
+                <td><button class="btn btn-danger" onclick="cmsBannerDelete(${b.id})"><i class="fas fa-trash"></i></button></td>
+              </tr>`).join('') : '<tr><td colspan="6" class="empty">No banners</td></tr>'}
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+    window.cmsBannerOpen = function() {
+      openModal('Add Banner', `
+        <div class="form-group"><label>Tag (e.g. WELCOME OFFER)</label><input class="input" id="bn-tag" value="WELCOME OFFER"></div>
+        <div class="form-group"><label>Title</label><input class="input" id="bn-title" value="PLAY &amp; GET"></div>
+        <div class="form-group"><label>Amount text</label><input class="input" id="bn-amount" value="৳1,000"></div>
+        <div class="form-group"><label>Subtitle</label><input class="input" id="bn-sub" value="100% BONUS on all game"></div>
+        <div class="form-group"><label>CTA</label><input class="input" id="bn-cta" value="BONUS"></div>
+        ${_cmsImageInput('bn-img','')}
+      `, async () => {
+        const payload = {
+          tag: document.getElementById('bn-tag').value,
+          title: document.getElementById('bn-title').value,
+          amount: document.getElementById('bn-amount').value,
+          subtitle: document.getElementById('bn-sub').value,
+          cta: document.getElementById('bn-cta').value,
+          imageUrl: document.getElementById('bn-img-url').value
+        };
+        const r = await API.Website.addBanner(payload);
+        if (r.success) { toast('Banner added!'); closeModal(); renderCmsBanners(); }
+        else toast(r.message || 'Failed', 'error');
+      });
+    };
+    window.cmsBannerDelete = async function(id) {
+      if (!confirm('Delete this banner?')) return;
+      const r = await API.Website.deleteBanner(id);
+      r.success ? (toast('Deleted'), renderCmsBanners()) : toast(r.message || 'Failed', 'error');
+    };
+
+    // ----- Social / Contact Links -----
+    async function renderCmsSocial() {
+      const r = await API.Website.socialLinks();
+      const list = r.data || [];
+      document.getElementById('content-area').innerHTML = `
+        <div class="filters-bar">
+          <span class="lbl">Social / Contact (${list.length})</span>
+          <div class="right-actions">
+            <button class="btn btn-primary" onclick="cmsSocialOpen()"><i class="fas fa-plus"></i> Add Link</button>
+          </div>
+        </div>
+        <div class="data-card">
+          <table class="data-table">
+            <thead><tr><th>Platform</th><th>Value</th><th>Visible</th><th>Action</th></tr></thead>
+            <tbody>
+              ${list.length ? list.map(s => `<tr>
+                <td>${s.platform || '-'}</td>
+                <td>${s.value || '-'}</td>
+                <td>${s.visible ? '<span style="color:#16a34a;">Yes</span>' : '<span style="color:#dc2626;">No</span>'}</td>
+                <td><div class="action-icons">
+                  <button class="ic" title="Edit" onclick="cmsSocialOpen(${s.id})"><i class="fas fa-pencil-alt"></i></button>
+                  <button class="ic" title="Delete" onclick="cmsSocialDelete(${s.id})"><i class="fas fa-trash"></i></button>
+                </div></td>
+              </tr>`).join('') : '<tr><td colspan="4" class="empty">No links</td></tr>'}
+            </tbody>
+          </table>
+        </div>
+      `;
+      window._cmsSocial = list;
+    }
+    window.cmsSocialOpen = function(id) {
+      const list = window._cmsSocial || [];
+      const s = id ? list.find(x => x.id === id) : { platform:'telegram', value:'', visible:true };
+      openModal(id ? 'Edit Link' : 'Add Link', `
+        <div class="form-group"><label>Platform</label>
+          <select class="input" id="sl-platform">
+            ${['telegram','whatsapp','email','skype','instagram','facebook','signup','app','saba','validation'].map(p =>
+              `<option value="${p}" ${s.platform===p?'selected':''}>${p}</option>`).join('')}
+          </select>
+        </div>
+        <div class="form-group"><label>Value (URL / number / handle)</label><input class="input" id="sl-value" value="${s.value||''}"></div>
+        <div class="form-group"><label><input type="checkbox" id="sl-visible" ${s.visible?'checked':''}> Visible</label></div>
+      `, async () => {
+        const payload = {
+          platform: document.getElementById('sl-platform').value,
+          value: document.getElementById('sl-value').value,
+          visible: document.getElementById('sl-visible').checked
+        };
+        const r = id ? await API.Website.updateSocialLink(id, payload) : await API.Website.addSocialLink(payload);
+        if (r.success) { toast('Saved!'); closeModal(); renderCmsSocial(); }
+        else toast(r.message || 'Failed', 'error');
+      });
+    };
+    window.cmsSocialDelete = async function(id) {
+      if (!confirm('Delete this link?')) return;
+      const r = await API.Website.deleteSocialLink(id);
+      r.success ? (toast('Deleted'), renderCmsSocial()) : toast(r.message || 'Failed', 'error');
+    };
+
+    // ----- Notice / News Bar -----
+    async function renderCmsNotice() {
+      const r = await API.Website.notice();
+      const n = r.data || { text:'', active:false };
+      document.getElementById('content-area').innerHTML = `
+        <div class="page-title">Notice / News Bar</div>
+        <div class="data-card" style="padding:22px;max-width:760px;">
+          <div class="form-group"><label>Notice Text (shown in marquee)</label><input class="input" id="nt-text" value="${(n.text||'').replace(/"/g,'&quot;')}"></div>
+          <div class="form-group"><label><input type="checkbox" id="nt-active" ${n.active?'checked':''}> Active</label></div>
+          <button class="btn btn-success" onclick="cmsNoticeSave()"><i class="fas fa-save"></i> Save Notice</button>
+        </div>
+      `;
+    }
+    window.cmsNoticeSave = async function() {
+      const payload = {
+        text: document.getElementById('nt-text').value,
+        active: document.getElementById('nt-active').checked
+      };
+      const r = await API.Website.updateNotice(payload);
+      r.success ? toast('Notice saved!') : toast(r.message || 'Failed', 'error');
+    };
+
+    // ----- Mobile Login Banners -----
+    async function renderCmsMobileBanners() {
+      const r = await API.Website.mobileBanners();
+      const list = r.data || [];
+      document.getElementById('content-area').innerHTML = `
+        <div class="filters-bar">
+          <span class="lbl">Mobile Login Banners (${list.length})</span>
+          <div class="right-actions">
+            <button class="btn btn-primary" onclick="cmsMobileBannerOpen()"><i class="fas fa-plus"></i> Add</button>
+          </div>
+        </div>
+        <div class="data-card">
+          <table class="data-table">
+            <thead><tr><th>Image</th><th>Caption</th><th>Active</th><th>Action</th></tr></thead>
+            <tbody>
+              ${list.length ? list.map(m => `<tr>
+                <td>${m.imageUrl ? `<img src="${cmsImg(m.imageUrl)}" style="height:42px;border-radius:4px;">` : '—'}</td>
+                <td>${m.caption || '-'}</td>
+                <td>${m.active ? '<span style="color:#16a34a;">Yes</span>' : '<span style="color:#dc2626;">No</span>'}</td>
+                <td><button class="btn btn-danger" onclick="cmsMobileBannerDelete(${m.id})"><i class="fas fa-trash"></i></button></td>
+              </tr>`).join('') : '<tr><td colspan="4" class="empty">No banners</td></tr>'}
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+    window.cmsMobileBannerOpen = function() {
+      openModal('Add Mobile Login Banner', `
+        ${_cmsImageInput('mb-img','')}
+        <div class="form-group"><label>Caption (optional)</label><input class="input" id="mb-caption"></div>
+        <div class="form-group"><label><input type="checkbox" id="mb-active" checked> Active</label></div>
+      `, async () => {
+        const payload = {
+          imageUrl: document.getElementById('mb-img-url').value,
+          caption: document.getElementById('mb-caption').value,
+          active: document.getElementById('mb-active').checked
+        };
+        const r = await API.Website.addMobileBanner(payload);
+        if (r.success) { toast('Added!'); closeModal(); renderCmsMobileBanners(); }
+        else toast(r.message || 'Failed', 'error');
+      });
+    };
+    window.cmsMobileBannerDelete = async function(id) {
+      if (!confirm('Delete this banner?')) return;
+      const r = await API.Website.deleteMobileBanner(id);
+      r.success ? (toast('Deleted'), renderCmsMobileBanners()) : toast(r.message || 'Failed', 'error');
+    };
+
+    // ===== WALLET MANAGEMENT =====
+    async function renderWalletDeposit() {
+      const dl = await API.Users.downline();
+      const users = dl.data || [];
+      document.getElementById('content-area').innerHTML = `
+        <div class="page-title">Wallet Deposit — Credit Downline</div>
+        <div class="data-card" style="padding:25px;max-width:550px;">
+          <div class="info-banner"><i class="fas fa-info-circle"></i> Your balance: <b>PBU ${Number(currentUser.wallet?.balance||0).toFixed(2)}</b></div>
+          <div class="form-group"><label>Select User</label><select class="input" id="wd-user"><option value="">-- Select --</option>${users.map(u=>`<option value="${u.id}">${u.username} (${u.role}) — PBU ${Number(u.wallet?.balance||0).toFixed(2)}</option>`).join('')}</select></div>
+          <div class="form-group"><label>Amount (PBU)</label><input class="input" id="wd-amount" type="number"></div>
+          <div class="form-group"><label>Note (optional)</label><input class="input" id="wd-note"></div>
+          <button class="btn btn-success" onclick="submitWalletDeposit()"><i class="fas fa-arrow-down"></i> Deposit</button>
+        </div>
+      `;
+    }
+    window.submitWalletDeposit = async function() {
+      const uid = Number(document.getElementById('wd-user').value), amt = Number(document.getElementById('wd-amount').value), n = document.getElementById('wd-note').value;
+      if(!uid||!amt) return toast('Fill all fields','error');
+      const r = await API.Banking.depositManual(uid, amt, n);
+      r.success?(toast('Deposited!'),refreshAll(),renderWalletDeposit()):toast(r.message,'error');
+    };
+    async function renderWalletWithdraw() {
+      const dl = await API.Users.downline();
+      const users = dl.data || [];
+      document.getElementById('content-area').innerHTML = `
+        <div class="page-title">Wallet Withdraw — Debit Downline</div>
+        <div class="data-card" style="padding:25px;max-width:550px;">
+          <div class="form-group"><label>Select User</label><select class="input" id="ww-user"><option value="">-- Select --</option>${users.map(u=>`<option value="${u.id}">${u.username} (${u.role}) — PBU ${Number(u.wallet?.balance||0).toFixed(2)}</option>`).join('')}</select></div>
+          <div class="form-group"><label>Amount (PBU)</label><input class="input" id="ww-amount" type="number"></div>
+          <div class="form-group"><label>Note (optional)</label><input class="input" id="ww-note"></div>
+          <button class="btn btn-danger" onclick="submitWalletWithdraw()"><i class="fas fa-arrow-up"></i> Withdraw</button>
+        </div>
+      `;
+    }
+    window.submitWalletWithdraw = async function() {
+      const uid = Number(document.getElementById('ww-user').value), amt = Number(document.getElementById('ww-amount').value), n = document.getElementById('ww-note').value;
+      if(!uid||!amt) return toast('Fill all fields','error');
+      const r = await API.Banking.withdrawManual(uid, amt, n);
+      r.success?(toast('Withdrew!'),refreshAll(),renderWalletWithdraw()):toast(r.message,'error');
+    };
+    async function renderWalletHistory(type) {
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('content-area').innerHTML = `
+        <div class="page-title">${type==='DEPOSIT'?'Deposit':'Withdraw'} History</div>
+        <div class="filters-bar"><span class="lbl">From</span><input id="wh-from" type="date" value="${today}"><span class="lbl">To</span><input id="wh-to" type="date" value="${today}"><button class="search-btn" onclick="loadWalletHistory('${type}')">Search</button></div>
+        <div id="wallet-history-results"><div class="empty">Click Search</div></div>
+      `;
+      loadWalletHistory(type);
+    }
+    window.loadWalletHistory = async function(type) {
+      const c = document.getElementById('wallet-history-results');
+      c.innerHTML='<div class="empty"><i class="fas fa-spinner fa-spin"></i></div>';
+      const r = await API.Banking.ledger(1, 100);
+      let txns = (r.data||[]).filter(t=>t.type===type);
+      const from = document.getElementById('wh-from')?.value, to = document.getElementById('wh-to')?.value;
+      if(from) txns = txns.filter(t=>new Date(t.createdAt)>=new Date(from));
+      if(to) txns = txns.filter(t=>new Date(t.createdAt)<=new Date(to+'T23:59:59'));
+      const total = txns.reduce((s,t)=>s+Number(t.amount||0),0);
+      c.innerHTML = `<div class="data-card">${txns.length?`<div style="padding:10px;background:#fef3c7;display:flex;justify-content:space-between;"><span><b>${txns.length}</b> transactions</span><span><b>Total: PBU ${total.toFixed(2)}</b></span></div><table class="data-table"><thead><tr><th>ID</th><th>User</th><th>Amount</th><th>Before</th><th>After</th><th>Description</th><th>Date</th></tr></thead><tbody>${txns.map(t=>`<tr><td>#${t.id}</td><td>${t.User?.username||'#'+t.userId}</td><td style="font-weight:600;color:${type==='DEPOSIT'?'#16a34a':'#dc2626'};">PBU ${Number(t.amount).toFixed(2)}</td><td>${Number(t.balanceBefore||0).toFixed(2)}</td><td>${Number(t.balanceAfter||0).toFixed(2)}</td><td>${t.description||'-'}</td><td>${new Date(t.createdAt).toLocaleString()}</td></tr>`).join('')}</tbody></table>`:'<div class="empty">No transactions</div>'}</div>`;
+    };
+
+    // ===== PRIVILEGES =====
+    async function renderPrivileges() {
+      const res = await API.Permissions.matrix();
+      matrixData = res.data || { modules: [], roles: [] };
+      const roles = matrixData.roles || [];
+      document.getElementById('content-area').innerHTML = `
+        <div class="flex-between"><div class="page-title" style="padding:0;">Role Privileges Manager</div>
+          <div style="display:flex;gap:8px;"><select class="input" id="clone-source" style="width:auto;"><option value="">Clone from...</option>${roles.filter(r=>r.name!=='OWNER').map(r=>`<option value="${r.name}">${r.name}</option>`).join('')}</select><select class="input" id="clone-target" style="width:auto;"><option value="">Clone to...</option>${roles.filter(r=>r.editable).map(r=>`<option value="${r.name}">${r.name}</option>`).join('')}</select><button class="btn btn-blue" onclick="clonePerms()"><i class="fas fa-copy"></i> Clone</button></div>
+        </div>
+        <div class="priv-layout">
+          <div class="priv-sidebar">
+            <div class="priv-title"><i class="fas fa-users"></i> ROLES (${roles.length})</div>
+            ${roles.map(r => `<div class="role-item" data-role="${r.name}" onclick="selectRole('${r.name}')"><div><div style="font-weight:600;font-size:12px;">${r.name.replace(/_/g,' ')}</div><div style="font-size:10px;color:#999;">Level ${r.level}</div></div><div style="font-size:10px;">${r.isFullAccess?'<i class="fas fa-star" style="color:#fbbf24;"></i>':r.editable?'<i class="fas fa-pen" style="color:#16a34a;"></i>':'<i class="fas fa-lock" style="color:#ccc;"></i>'}</div></div>`).join('')}
+          </div>
+          <div class="priv-content"><div id="perm-detail"><div class="empty"><i class="fas fa-hand-pointer" style="font-size:48px;opacity:0.3;display:block;margin-bottom:10px;"></i>Select a role to view permissions</div></div></div>
+        </div>
+      `;
+    }
+    window.selectRole = function(roleName) {
+      selectedRole = roleName;
+      document.querySelectorAll('.role-item').forEach(i=>i.classList.remove('active-role'));
+      const a = document.querySelector(`.role-item[data-role="${roleName}"]`); if(a) a.classList.add('active-role');
+      const rd = matrixData.roles.find(r=>r.name===roleName); if(!rd) return;
+      const perms = new Set(rd.permissions);
+      const isOwner = rd.isFullAccess;
+
+      document.getElementById('perm-detail').innerHTML = `
+        <div class="flex-between" style="padding-bottom:15px;border-bottom:3px solid #fbbf24;margin-bottom:20px;">
+          <div><h3><i class="fas fa-shield-alt" style="color:#fbbf24;"></i> ${roleName.replace(/_/g,' ')}</h3><div style="font-size:11px;color:#888;">Level ${rd.level} | ${isOwner?'Full Access':perms.size+' permissions'}</div></div>
+          ${isOwner?'<span class="badge badge-green" style="padding:6px 14px;"><i class="fas fa-crown"></i> OWNER</span>':rd.editable?`<button class="btn btn-success" id="save-perms-btn" onclick="savePermissions('${roleName}')"><i class="fas fa-save"></i> Save Changes</button>`:''}
+        </div>
+        ${isOwner?'<div class="info-banner" style="background:#d4edda;border-color:#16a34a;color:#155724;text-align:center;padding:20px;"><i class="fas fa-crown" style="font-size:36px;color:#fbbf24;display:block;margin-bottom:10px;"></i><b>OWNER has unrestricted access</b></div>':`
+          ${rd.editable?'<div style="display:flex;gap:8px;margin-bottom:15px;"><button class="btn btn-success" style="font-size:11px;" onclick="toggleAllPerms(true)"><i class="fas fa-check-double"></i> Enable All</button><button class="btn btn-danger" style="font-size:11px;" onclick="toggleAllPerms(false)"><i class="fas fa-times"></i> Disable All</button><span id="perm-counter" style="margin-left:auto;font-size:12px;color:#666;padding-top:5px;">${perms.size} permissions</span></div>':'<div class="info-banner">Read-only — you cannot edit this role</div>'}
+          <div style="display:grid;gap:10px;">${Object.entries(MODULE_META).map(([mod, meta]) => {
+            const enabled = meta.actions.filter(a => perms.has(`${mod}:${a}`));
+            const all = enabled.length === meta.actions.length;
+            const some = enabled.length > 0;
+            return `<div class="perm-card" style="border-color:${some?'#c3e6cb':'#e9ecef'};">
+              <div class="perm-header" style="background:${some?'#d4edda':'#f8f9fa'};${rd.editable?'cursor:pointer;':''}" ${rd.editable?`onclick="toggleModule('${mod}')"`:''}>
+                <div><i class="fas ${meta.icon}" style="color:${some?'#16a34a':'#999'};margin-right:8px;"></i><b>${mod}</b> <span style="font-size:10px;color:#888;">(${enabled.length}/${meta.actions.length})</span></div>
+                ${some?'<i class="fas fa-toggle-on" style="color:#16a34a;font-size:18px;"></i>':'<i class="fas fa-toggle-off" style="color:#ccc;font-size:18px;"></i>'}
+              </div>
+              <div style="padding:8px 14px;display:flex;flex-wrap:wrap;gap:6px;">${meta.actions.map(action => {
+                const key = `${mod}:${action}`;
+                const ena = perms.has(key);
+                return `<label class="perm-toggle-label" style="background:${ena?'#16a34a':'#e9ecef'};color:${ena?'white':'#888'};${rd.editable?'cursor:pointer;':''}" ${rd.editable?`onclick="togglePerm('${key}',this)"`:''}><i class="fas ${ena?'fa-check':'fa-times'}" style="font-size:9px;"></i> ${action}</label>`;
+              }).join('')}</div>
+            </div>`;
+          }).join('')}</div>
+        `}
+      `;
+    };
+    window.togglePerm = function(key, el) {
+      const rd = matrixData.roles.find(r=>r.name===selectedRole); if(!rd||!rd.editable) return;
+      const perms = new Set(rd.permissions);
+      if(perms.has(key)){ perms.delete(key); el.style.background='#e9ecef'; el.style.color='#888'; el.querySelector('i').className='fas fa-times'; }
+      else { perms.add(key); el.style.background='#16a34a'; el.style.color='white'; el.querySelector('i').className='fas fa-check'; }
+      rd.permissions = Array.from(perms);
+      const c = document.getElementById('perm-counter'); if(c) c.textContent = `${perms.size} permissions`;
+    };
+    window.toggleModule = function(mod) {
+      const rd = matrixData.roles.find(r=>r.name===selectedRole); if(!rd||!rd.editable) return;
+      const perms = new Set(rd.permissions);
+      const meta = MODULE_META[mod];
+      const all = meta.actions.every(a=>perms.has(`${mod}:${a}`));
+      meta.actions.forEach(a => { const k = `${mod}:${a}`; if(all) perms.delete(k); else perms.add(k); });
+      rd.permissions = Array.from(perms);
+      selectRole(selectedRole);
+    };
+    window.toggleAllPerms = function(enable) {
+      const rd = matrixData.roles.find(r=>r.name===selectedRole); if(!rd||!rd.editable) return;
+      const perms = new Set();
+      if(enable) Object.entries(MODULE_META).forEach(([mod,meta])=>meta.actions.forEach(a=>perms.add(`${mod}:${a}`)));
+      rd.permissions = Array.from(perms);
+      selectRole(selectedRole);
+    };
+    window.savePermissions = async function(roleName) {
+      const rd = matrixData.roles.find(r=>r.name===roleName); if(!rd) return;
+      const r = await API.Permissions.updateRole(roleName, rd.permissions);
+      if(r.success){ toast(`Saved for ${roleName}!`); const ref = await API.Permissions.matrix(); matrixData = ref.data || matrixData; }
+      else toast(r.message||'Failed','error');
+    };
+    window.clonePerms = async function() {
+      const s = document.getElementById('clone-source').value, t = document.getElementById('clone-target').value;
+      if(!s||!t) return toast('Select both','error');
+      if(s===t) return toast('Source and target must differ','error');
+      const r = await API.Permissions.clone(s, t);
+      if(r.success){ toast(`Cloned ${r.data?.clonedCount||0} permissions`); const ref = await API.Permissions.matrix(); matrixData = ref.data || matrixData; if(selectedRole===t) selectRole(t); }
+      else toast(r.message,'error');
+    };
+
+    // ===== ADMIN SETTING =====
+    function renderAdminSetting() {
+      const isOwner = currentUser.role === 'OWNER';
+      document.getElementById('content-area').innerHTML = `
+        <div class="page-title">Admin Settings</div>
+        <div class="icon-cards-section"><h3>General Settings</h3><div class="icon-cards-grid">
+          <div class="icon-card" onclick="openChangePass()"><i class="fas fa-key"></i><div class="label">Change Password</div></div>
+          <div class="icon-card green" onclick="openDepositChips()"><i class="fas fa-coins"></i><div class="label">Deposit Chips</div></div>
+          <div class="icon-card purple" onclick="openSearchUsers()"><i class="fas fa-search"></i><div class="label">Search Users</div></div>
+          ${isOwner?`<div class="icon-card blue" onclick="openWebsiteSettings()"><i class="fas fa-globe"></i><div class="label">Website Setting</div></div>`:''}
+          ${isOwner?`<div class="icon-card amber" onclick="openDefaultSettings()"><i class="fas fa-tools"></i><div class="label">Default Settings</div></div>`:''}
+          ${isOwner?`<div class="icon-card cyan" onclick="openConcurrentUsers()"><i class="fas fa-users-cog"></i><div class="label">Concurrent Users</div></div>`:''}
+          ${isOwner?`<div class="icon-card peach" onclick="openP2PSetting()"><i class="fas fa-handshake"></i><div class="label">P2P Settings</div></div>`:''}
+          <div class="icon-card yellow" onclick="openSurveillance()"><i class="fas fa-shield-alt"></i><div class="label">Surveillance</div></div>
+          ${isOwner?`<div class="icon-card lime" onclick="openWhitelabelLimit()"><i class="fas fa-layer-group"></i><div class="label">Whitelabel Limit</div></div>`:''}
+        </div></div>
+        <div class="icon-cards-section"><h3>Match And Bets</h3><div class="icon-cards-grid">
+          <div class="icon-card green" onclick="openMatchList('ACTIVE')"><i class="fas fa-clipboard-check"></i><div class="label">Active Match List</div></div>
+          <div class="icon-card dark-red" onclick="openMatchList('INACTIVE')"><i class="fas fa-clipboard-list"></i><div class="label">Inactive Match List</div></div>
+          <div class="icon-card olive" onclick="openFancyStatus()"><i class="fas fa-bolt"></i><div class="label">Update Fancy Status</div></div>
+          <div class="icon-card amber" onclick="openSuspendedResult()"><i class="fas fa-pause-circle"></i><div class="label">Suspended Result</div></div>
+          <div class="icon-card peach" onclick="openRejectedBets()"><i class="fas fa-times-circle"></i><div class="label">Rejected Bets</div></div>
+        </div></div>
+        <div class="icon-cards-section"><h3>Message Settings</h3><div class="icon-cards-grid">
+          <div class="icon-card blue" onclick="openMessage('USER')"><i class="fas fa-comment"></i><div class="label">User Message</div></div>
+          <div class="icon-card peach" onclick="openMessage('HYPER')"><i class="fas fa-bullhorn"></i><div class="label">Hyper Message</div></div>
+          <div class="icon-card green" onclick="openMessage('IMPORTANT')"><i class="fas fa-info-circle"></i><div class="label">Important Message</div></div>
+          <div class="icon-card purple" onclick="openMessage('IMAGE')"><i class="fas fa-images"></i><div class="label">Image Message</div></div>
+        </div></div>
+        <div class="icon-cards-section"><h3>User Settings</h3><div class="icon-cards-grid">
+          <div class="icon-card lime" onclick="openInactiveUsers()"><i class="fas fa-user-slash"></i><div class="label">Inactive Users</div></div>
+          <div class="icon-card amber" onclick="openBetLockedUsers()"><i class="fas fa-user-lock"></i><div class="label">Bet Locked Users</div></div>
+          <div class="icon-card dark-red" onclick="openDeletedUsers()"><i class="fas fa-trash-alt"></i><div class="label">Deleted Users</div></div>
+        </div></div>
+        <div class="icon-cards-section"><h3>Security & Common</h3><div class="icon-cards-grid">
+          <div class="icon-card purple" onclick="openCheatBets()"><i class="fas fa-user-secret"></i><div class="label">Cheat Bets</div></div>
+          <div class="icon-card blue" onclick="openSportsMarket()"><i class="fas fa-volleyball-ball"></i><div class="label">Sports Main Market</div></div>
+          <div class="icon-card green" onclick="openDashboardImage()"><i class="fas fa-desktop"></i><div class="label">Dashboard Image</div></div>
+          <div class="icon-card peach" onclick="openBannerSetting()"><i class="fas fa-flag"></i><div class="label">Banner Setting</div></div>
+        </div></div>
+      `;
+    }
+
+    // ===== ADMIN SETTING HANDLERS =====
+    window.openChangePass = function() {
+      openModal('Change Password', `<div class="form-group"><label>Current</label><input class="input" id="cp-old" type="password"></div><div class="form-group"><label>New</label><input class="input" id="cp-new" type="password"></div>`, async () => {
+        const r = await API.Auth.changePassword(document.getElementById('cp-old').value, document.getElementById('cp-new').value);
+        r.success?(toast('Password changed!'),closeModal()):toast(r.message,'error');
+      });
+    };
+    window.openDepositChips = function() {
+      openModal('Deposit Chips', `<div class="form-group"><label>User ID</label><input class="input" id="dc-uid" type="number"></div><div class="form-group"><label>Amount</label><input class="input" id="dc-amt" type="number"></div>`, async () => {
+        const r = await API.Banking.depositManual(Number(document.getElementById('dc-uid').value), Number(document.getElementById('dc-amt').value));
+        r.success?(toast('Deposited!'),closeModal()):toast(r.message,'error');
+      });
+    };
+    window.openSearchUsers = function() {
+      openModal('Search Users', `<div class="form-group"><label>Search</label><input class="input" id="su-q" placeholder="Username/ID/email" oninput="liveSearch()"></div><div id="su-results"></div>`, () => closeModal());
+    };
+    window.liveSearch = async function() {
+      const q = document.getElementById('su-q').value;
+      if(q.length < 2) return;
+      const r = await API.Users.search(q);
+      const u = r.data || [];
+      document.getElementById('su-results').innerHTML = u.length?`<table class="data-table"><thead><tr><th>ID</th><th>User</th><th>Role</th><th>Balance</th></tr></thead><tbody>${u.map(x=>`<tr><td>#${x.id}</td><td>${x.username}</td><td>${x.role}</td><td>PBU ${Number(x.wallet?.balance||0).toFixed(2)}</td></tr>`).join('')}</tbody></table>`:'<div class="empty">No results</div>';
+    };
+    window.openWebsiteSettings = async function() {
+      const r = await API.Website.settings(); const d = r.data || {};
+      openModal('Website Settings', `<div class="form-group"><label>Site Name</label><input class="input" id="ws-name" value="${d.siteName||''}"></div><div class="form-group"><label>Notice</label><textarea class="input" id="ws-notice" rows="3">${d.notice||''}</textarea></div><div class="form-group"><label>Maintenance</label><select class="input" id="ws-maint"><option value="false" ${!d.maintenanceMode?'selected':''}>OFF</option><option value="true" ${d.maintenanceMode?'selected':''}>ON</option></select></div>`, async () => {
+        await API.Website.updateSettings({ site_name: document.getElementById('ws-name').value, notice: document.getElementById('ws-notice').value, maintenance_mode: document.getElementById('ws-maint').value === 'true' });
+        toast('Saved!'); closeModal();
+      });
+    };
+    window.openDefaultSettings = async function() {
+      const r = await API.Settings.defaults(); const d = r.data || {};
+      openModal('Default Settings', `<div class="form-group"><label>Min Bet</label><input class="input" id="ds-min" type="number" value="${d.minBet||10}"></div><div class="form-group"><label>Max Bet</label><input class="input" id="ds-max" type="number" value="${d.maxBet||50000}"></div><div class="form-group"><label>Commission %</label><input class="input" id="ds-comm" type="number" value="${d.commissionBase||5}"></div>`, async () => {
+        await API.Settings.updateDefaults({ min_bet: Number(document.getElementById('ds-min').value), max_bet: Number(document.getElementById('ds-max').value), commission_base: Number(document.getElementById('ds-comm').value) });
+        toast('Saved!'); closeModal();
+      });
+    };
+    window.openConcurrentUsers = async function() {
+      const r = await API.Settings.concurrentUsers();
+      openModal('Concurrent Users', `<div class="form-group"><label>Max Sessions</label><input class="input" id="cu-max" type="number" value="${r.data?.maxConcurrentSessions||3}"></div>`, async () => {
+        await API.Settings.updateConcurrentUsers(Number(document.getElementById('cu-max').value));
+        toast('Saved!'); closeModal();
+      });
+    };
+    window.openP2PSetting = async function() {
+      const r = await API.Settings.p2p(); const d = r.data || {};
+      openModal('P2P Settings', `<div class="form-group"><label>P2P Enabled</label><select class="input" id="p2p-on"><option value="true" ${d.enabled?'selected':''}>ON</option><option value="false" ${!d.enabled?'selected':''}>OFF</option></select></div><div class="form-group"><label>Min Amount</label><input class="input" id="p2p-min" type="number" value="${d.minTransferAmount||100}"></div><div class="form-group"><label>Max Amount</label><input class="input" id="p2p-max" type="number" value="${d.maxTransferAmount||10000}"></div>`, async () => {
+        await API.Settings.updateP2P({ enabled: document.getElementById('p2p-on').value==='true', maxTransferAmount: Number(document.getElementById('p2p-max').value), minTransferAmount: Number(document.getElementById('p2p-min').value) });
+        toast('Saved!'); closeModal();
+      });
+    };
+    window.openSurveillance = async function() {
+      const r = await API.Surveillance.logs(1);
+      openModal('Surveillance', `${(r.data||[]).length?`<table class="data-table"><thead><tr><th>User</th><th>Action</th><th>IP</th><th>Date</th></tr></thead><tbody>${r.data.slice(0,15).map(l=>`<tr><td>${l.User?.username||'-'}</td><td>${l.action}</td><td>${l.ipAddress||'-'}</td><td>${new Date(l.createdAt).toLocaleString()}</td></tr>`).join('')}</tbody></table>`:'<div class="empty">No logs</div>'}`, ()=>closeModal());
+    };
+    window.openWhitelabelLimit = async function() {
+      const r = await API.Website.whitelabelLimit(); const d = r.data || {};
+      openModal('Whitelabel Limit', `<div style="margin-bottom:14px;font-size:12px;">Current: <b>${d.current||0}</b> / Limit: <b>${d.limit||10}</b></div><div class="form-group"><label>Set Limit</label><input class="input" id="wl-limit" type="number" value="${d.limit||10}"></div>`, async () => {
+        await API.Website.updateWhitelabelLimit(Number(document.getElementById('wl-limit').value));
+        toast('Saved!'); closeModal();
+      });
+    };
+    window.openMatchList = async function(status) {
+      const r = await API.Matches.list(1, status);
+      openModal(`${status} Matches`, `${(r.data||[]).length?`<table class="data-table"><thead><tr><th>ID</th><th>Match</th><th>League</th><th>Status</th></tr></thead><tbody>${r.data.map(m=>`<tr><td>#${m.id}</td><td>${m.teamA} vs ${m.teamB}</td><td>${m.League?.name||'-'}</td><td>${m.status}</td></tr>`).join('')}</tbody></table>`:'<div class="empty">No matches</div>'}`, ()=>closeModal());
+    };
+    window.openFancyStatus = async function() {
+      const r = await API.Matches.fancy();
+      openModal('Fancy Markets', `${(r.data||[]).length?`<table class="data-table"><thead><tr><th>Name</th><th>Match</th><th>Status</th><th>Action</th></tr></thead><tbody>${r.data.map(m=>`<tr><td>${m.name}</td><td>${m.Match?m.Match.teamA+' vs '+m.Match.teamB:'-'}</td><td>${m.isSuspended?'Suspended':'Open'}</td><td><button class="btn btn-orange" onclick="toggleFancy(${m.id})">${m.isSuspended?'Open':'Suspend'}</button></td></tr>`).join('')}</tbody></table>`:'<div class="empty">No fancy markets</div>'}`, ()=>closeModal());
+    };
+    window.toggleFancy = async function(id) { const r = await API.Matches.toggleFancy(id); r.success?toast('Toggled'):toast(r.message,'error'); };
+    window.openSuspendedResult = async function() {
+      const r = await API.Results.suspended();
+      openModal('Suspended Results', `${(r.data||[]).length?`<table class="data-table"><thead><tr><th>Match</th><th>Selection</th><th>Reason</th><th>Action</th></tr></thead><tbody>${r.data.map(rs=>`<tr><td>${rs.Match?rs.Match.teamA+' vs '+rs.Match.teamB:'-'}</td><td>${rs.winningSelection}</td><td>${rs.suspendedReason||'-'}</td><td><button class="btn btn-success" onclick="releaseResult(${rs.id})">Release</button></td></tr>`).join('')}</tbody></table>`:'<div class="empty">No suspended results</div>'}`, ()=>closeModal());
+    };
+    window.openRejectedBets = async function() {
+      const r = await API.Bets.list(1, 50, 'REJECTED');
+      openModal('Rejected Bets', `${(r.data||[]).length?`<table class="data-table"><thead><tr><th>ID</th><th>User</th><th>Match</th><th>Stake</th></tr></thead><tbody>${r.data.map(b=>`<tr><td>#${b.id}</td><td>${b.User?.username||'-'}</td><td>${b.Match?b.Match.teamA+' vs '+b.Match.teamB:'-'}</td><td>${b.stake}</td></tr>`).join('')}</tbody></table>`:'<div class="empty">No rejected bets</div>'}`, ()=>closeModal());
+    };
+    window.openMessage = function(type) {
+      openModal(`${type} Message`, `<div class="form-group"><label>Title</label><input class="input" id="msg-title"></div><div class="form-group"><label>Content</label><textarea class="input" id="msg-content" rows="3"></textarea></div>${type==='IMAGE'?'<div class="form-group"><label>Image URL</label><input class="input" id="msg-img"></div>':''}${type==='USER'?'<div class="form-group"><label>Target User ID (optional)</label><input class="input" id="msg-target" type="number"></div>':''}`, async () => {
+        const t = document.getElementById('msg-title').value, c = document.getElementById('msg-content').value;
+        let r;
+        if(type==='USER') r = await API.Messages.sendUser(t, c, document.getElementById('msg-target')?.value||null);
+        else if(type==='HYPER') r = await API.Messages.sendHyper(t, c);
+        else if(type==='IMPORTANT') r = await API.Messages.sendImportant(t, c);
+        else r = await API.Messages.sendImage(t, document.getElementById('msg-img')?.value||'', c);
+        r.success?(toast('Sent!'),closeModal()):toast(r.message,'error');
+      });
+    };
+    window.openInactiveUsers = async function() {
+      const r = await API.Users.inactive();
+      openModal('Inactive Users', `${(r.data||[]).length?`<table class="data-table"><thead><tr><th>User</th><th>Role</th><th>Status</th><th>Action</th></tr></thead><tbody>${r.data.map(u=>`<tr><td>${u.username}</td><td>${u.role}</td><td>${u.status}</td><td><button class="btn btn-success" onclick="API.Users.changeStatus(${u.id},'active').then(()=>{toast('Activated');closeModal();})">Activate</button></td></tr>`).join('')}</tbody></table>`:'<div class="empty">No inactive users</div>'}`, ()=>closeModal());
+    };
+    window.openBetLockedUsers = async function() {
+      const r = await API.Users.betLocked();
+      openModal('Bet Locked Users', `${(r.data||[]).length?`<table class="data-table"><thead><tr><th>User</th><th>Role</th><th>Action</th></tr></thead><tbody>${r.data.map(u=>`<tr><td>${u.username}</td><td>${u.role}</td><td><button class="btn btn-success" onclick="API.Users.toggleBetLock(${u.id}).then(()=>{toast('Unlocked');closeModal();})">Unlock</button></td></tr>`).join('')}</tbody></table>`:'<div class="empty">No bet-locked users</div>'}`, ()=>closeModal());
+    };
+    window.openDeletedUsers = async function() {
+      const r = await API.Users.deleted();
+      openModal('Deleted Users', `${(r.data||[]).length?`<table class="data-table"><thead><tr><th>User</th><th>Role</th><th>Action</th></tr></thead><tbody>${r.data.map(u=>`<tr><td>${u.username}</td><td>${u.role}</td><td><button class="btn btn-success" onclick="API.Users.restore(${u.id}).then(()=>{toast('Restored');closeModal();})">Restore</button></td></tr>`).join('')}</tbody></table>`:'<div class="empty">No deleted users</div>'}`, ()=>closeModal());
+    };
+    window.openCheatBets = async function() {
+      const r = await API.Bets.cheat();
+      openModal('Cheat Bets', `${(r.data||[]).length?`<table class="data-table"><thead><tr><th>ID</th><th>User</th><th>Stake</th><th>Reason</th></tr></thead><tbody>${r.data.map(b=>`<tr><td>#${b.id}</td><td>${b.User?.username||'-'}</td><td>${b.stake}</td><td>${b.cheatReason||'-'}</td></tr>`).join('')}</tbody></table>`:'<div class="empty">No cheat bets</div>'}`, ()=>closeModal());
+    };
+    window.openSportsMarket = async function() {
+      const r = await API.Settings.sportsMainMarket(); const d = r.data || {};
+      openModal('Sports Main Market', `${Object.entries(d).map(([k,v])=>`<div class="form-group"><label>${k}</label><select class="input" id="sm-${k}"><option value="true" ${v?'selected':''}>ON</option><option value="false" ${!v?'selected':''}>OFF</option></select></div>`).join('')}`, async () => {
+        const data = {}; document.querySelectorAll('[id^="sm-"]').forEach(el => data[el.id.replace('sm-','')] = el.value === 'true');
+        await API.Settings.updateSportsMainMarket(data); toast('Saved!'); closeModal();
+      });
+    };
+    window.openDashboardImage = async function() {
+      const r = await API.Website.dashboardImages();
+      openModal('Dashboard Images', `<div class="form-group"><label>Image URL</label><input class="input" id="di-url"><button class="btn btn-success" style="margin-top:5px;" onclick="addDashImg()">Add</button></div><div style="display:flex;flex-wrap:wrap;gap:10px;">${(r.data||[]).map(i=>`<div style="position:relative;"><img src="${i.url||i.imageUrl||''}" style="width:140px;height:90px;object-fit:cover;border-radius:4px;"><button class="btn btn-danger" style="position:absolute;top:2px;right:2px;font-size:10px;padding:2px 6px;" onclick="API.Website.deleteDashboardImage(${i.id}).then(()=>toast('Deleted'))">X</button></div>`).join('')}</div>`, ()=>closeModal());
+    };
+    window.addDashImg = async function() { const r = await API.Website.addDashboardImage({url:document.getElementById('di-url').value}); r.success?toast('Added'):toast(r.message,'error'); };
+    window.openBannerSetting = async function() {
+      const r = await API.Website.banners();
+      openModal('Banner Settings', `<div class="form-group"><label>Image URL</label><input class="input" id="bn-url"></div><div class="form-group"><label>Link</label><input class="input" id="bn-link"></div><button class="btn btn-success" onclick="addBanner()">Add Banner</button><div style="margin-top:15px;">${(r.data||[]).map(b=>`<div style="padding:8px;border:1px solid #eee;margin-top:5px;display:flex;justify-content:space-between;">${b.title||b.imageUrl||'Banner'} <button class="btn btn-danger" onclick="API.Website.deleteBanner(${b.id}).then(()=>toast('Deleted'))">Delete</button></div>`).join('')}</div>`, ()=>closeModal());
+    };
+    window.addBanner = async function() { const r = await API.Website.addBanner({imageUrl:document.getElementById('bn-url').value,link:document.getElementById('bn-link').value}); r.success?toast('Added'):toast(r.message,'error'); };
+
+    init();
+  </script>
+</body>
+</html>
